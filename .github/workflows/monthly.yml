@@ -1,0 +1,40 @@
+name: Monthly IAPD Feed Download & Pipeline
+
+on:
+  schedule:
+    # Run on the 3rd of every month at 12:00 UTC
+    - cron: "0 12 3 * *"
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Download IAPD feeds
+        run: python3 scripts/download_feeds.py
+
+      - name: Run pipeline
+        run: python3 src/pipeline.py
+        env:
+          AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+          AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+          AIRTABLE_TABLE: ${{ secrets.AIRTABLE_TABLE }}
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "nbctrust-bot"
+          git config user.email "noreply@nbctrust.example"
+          git add data/raw data/processed
+          if ! git diff --quiet --cached; then
+            git commit -m "Monthly IAPD refresh: $(date -u +%Y-%m-%d)"
+            git push
+          fi

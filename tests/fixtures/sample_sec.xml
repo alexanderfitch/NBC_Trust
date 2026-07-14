@@ -1,0 +1,141 @@
+<Firm>
+      <Info SECRgnCD="CHRO" FirmCrdNb="288301" SECNb="801-120730" BusNm="AO WEALTH ADVISORY" LegalNm="A.O. WEALTH ADVISORY,LLC" UmbrRgstn="N"/>
+      <MainAddr Strt1="2570 106TH STREET, SUITE A" City="URBANDALE" State="IA" Cntry="United States" PostlCd="50322" PhNb="515-224-7849"/>
+      <MailingAddr/>
+      <Rgstn FirmType="Registered" St="APPROVED" Dt="2021-04-08"/>
+      <NoticeFiled>
+        <States RgltrCd="IA" St="FILED" Dt="2021-04-08"/>
+        <States RgltrCd="TX" St="FILED" Dt="2021-04-08"/>
+      </NoticeFiled>
+      <Filing Dt="2026-02-10" FormVrsn="10/2021"/>
+      <FormInfo>
+        <Part1A>
+          <Item1 Q1F5="0" Q1I="Y" Q1M="N" Q1N="N" Q1O="N">
+            <WebAddrs>
+              <WebAddr>https://www.instagram.com/aowealthadvisory/</WebAddr>
+              <WebAddr>HTTP://AOWEALTHADVISORY.COM</WebAddr>
+              <WebAddr>https://twitter.com/AOWealth</WebAddr>
+              <WebAddr>https://www.linkedin.com/company/ao-wealth-advisory</WebAddr>
+              <WebAddr>https://www.facebook.com/aowealth</WebAddr>
+            </WebAddrs>
+          </Item1>
+          <Item2A Q2A1="Y" Q2A2="N" Q2A4="N" Q2A5="N" Q2A6="N" Q2A7="N" Q2A8="N" Q2A9="N" Q2A10="N" Q2A11="N" Q2A12="N" Q2A13="N"/>
+          <Item2B/>
+          <Item3A OrgFormNm="Limited Liability Company"/>
+          <Item3B Q3B="DECEMBER"/>
+          <Item3C StateCD="IA" CntryNm="United States"/>
+          <Item5A TtlEmp="7"/>
+          <Item5B Q5B1="4" Q5B2="0" Q5B3="4" Q5B4="0" Q5B5="1" Q5B6="0"/>
+          <Item5C Q5C1="0" Q5C2="0"/>
+          <Item5D Q5DA1="238" Q5DA3="78537447" Q5DB1="60" Q5DB3="119744689" Q5DG1="13" Q5DG3="14921205"/>
+          <Item5E Q5E1="Y" Q5E2="Y" Q5E3="N" Q5E4="Y" Q5E5="N" Q5E6="N" Q5E7="N"/>
+          <Item5F Q5F1="Y" Q5F2A="200919186" Q5F2B="12284155" Q5F2C="213203341" Q5F2D="1121" Q5F2E="3" Q5F2F="1124" Q5F3="0"/>
+          <Item5G Q5G1="Y" Q5G2="Y" Q5G3="N" Q5G4="N" Q5G5="Y" Q5G6="N" Q5G7="N" Q5G8="N" Q5G9="N" Q5G10="N" Q5G11="Y" Q5G12="N"/>
+          <Item5H Q5H="251-500"/>
+          <Item5I Q5I1="N"/>
+          <Item5J Q5J1="N" Q5J2="N"/>
+          <Item5K Q5K1="Y" Q5K2="N" Q5K3="N" Q5K4="Y"/>
+          <Item5L Q5L1A="N" Q5L1B="N" Q5L1C="N" Q5L1D="N" Q5L1E="N" Q5L3="N" Q5L4="N"/>
+          <Item6A Q6A1="N" Q6A2="N" Q6A3="N" Q6A4="N" Q6A5="N" Q6A6="Y" Q6A7="N" Q6A8="N" Q6A9="N" Q6A10="N" Q6A11="N" Q6A12="N" Q6A13="N" Q6A14="N"/>
+          <Item6B Q6B1="N" Q6B3="Y"/>
+          <Item7A/>
+          <Item7B Q7B="N"/>
+          <Item8A Q8A1="N" Q8A2="Y" Q8A3="N"/>
+          <Item8B Q8B1="N" Q8B2="N" Q8B3="N"/>
+          <Item8C Q8C1="Y" Q8C2="Y" Q8C3="Y" Q8C4="Y"/>
+          <Item8D Q8D="N"/>
+          <Item8E Q8E="Y"/>
+          <Item8F Q8F="N"/>
+          <Item8G Q8G1="Y" Q8G2="Y"/>
+          <Item8H Q8H1="N" Q8H2="N"/>
+          <Item8I Q8I="N"/>
+          <Item9A Q9A1A="Y" Q9A1B="Y" Q9A2A="4222421" Q9A2B="2"/>
+          <Item9B Q9B1A="N" Q9B1B="N"/>
+          <Item9C Q9C1="N" Q9C2="N" Q9C3="N" Q9C4="N"/>
+          <Item9D Q9D1="N" Q9D2="N"/>
+          <Item9E/>
+          <Item9F Q9F="1"/>
+          <Item10A Q10A="N"/>
+          <Item11 Q11="N"/>
+          <Item11A Q11A1="N" Q11A2="N"/>
+          <Item11B Q11B1="N" Q11B2="N"/>
+          <Item11C Q11C1="N" Q11C2="N" Q11C3="N" Q11C4="N" Q11C5="N"/>
+          <Item11D Q11D1="N" Q11D2="N" Q11D3="N" Q11D4="N" Q11D5="N"/>
+          <Item11E Q11E1="N" Q11E2="N" Q11E3="N" Q11E4="N"/>
+          <Item11F Q11F="N"/>
+          <Item11G Q11G="N"/>
+          <Item11H Q11H1A="N" Q11H1B="N" Q11H1C="N" Q11H2="N"/>
+        </Part1A>
+      </FormInfo>
+    </Firm>
+<Firm>
+      <Info SECRgnCD="DRO" FirmCrdNb="105053" SECNb="801-27034" BusNm="LAWSON KROEKER INVESTMENT MANAGEMENT INC" LegalNm="LAWSON KROEKER INVESTMENT MANAGEMENT INC" UmbrRgstn="N"/>
+      <MainAddr Strt1="1926 S. 67TH STREET" Strt2="SUITE 201" City="OMAHA" State="NE" Cntry="United States" PostlCd="68106" PhNb="402-392-2606" FaxNb="402-392-2597"/>
+      <MailingAddr/>
+      <Rgstn FirmType="Registered" St="APPROVED" Dt="1986-05-22"/>
+      <NoticeFiled>
+        <States RgltrCd="CA" St="FILED" Dt="2015-01-08"/>
+        <States RgltrCd="LA" St="FILED" Dt="2018-03-30"/>
+        <States RgltrCd="NE" St="FILED" Dt="1986-05-12"/>
+        <States RgltrCd="TX" St="FILED" Dt="1994-05-27"/>
+      </NoticeFiled>
+      <Filing Dt="2026-03-04" FormVrsn="10/2021"/>
+      <FormInfo>
+        <Part1A>
+          <Item1 Q1F5="0" Q1I="Y" Q1M="N" Q1N="N" Q1O="N">
+            <WebAddrs>
+              <WebAddr>HTTPS://WWW.LAWSONKROEKER.COM</WebAddr>
+              <WebAddr>HTTPS://WWW.FACEBOOK.COM/LAWSON-KROEKER-INVESTMENT-MANAGEMENT-212510375998575/</WebAddr>
+              <WebAddr>HTTPS://WWW.LINKEDIN.COM/COMPANY/LAWSON-KROEKER-INVESTMENT-MANAGEMENT/</WebAddr>
+              <WebAddr>HTTP://WWW.LKFUNDS.COM</WebAddr>
+            </WebAddrs>
+          </Item1>
+          <Item2A Q2A1="Y" Q2A2="N" Q2A4="N" Q2A5="Y" Q2A6="N" Q2A7="N" Q2A8="N" Q2A9="N" Q2A10="N" Q2A11="N" Q2A12="N" Q2A13="N"/>
+          <Item2B/>
+          <Item3A OrgFormNm="Corporation"/>
+          <Item3B Q3B="DECEMBER"/>
+          <Item3C StateCD="NE" CntryNm="United States"/>
+          <Item5A TtlEmp="7"/>
+          <Item5B Q5B1="4" Q5B2="0" Q5B3="4" Q5B4="0" Q5B5="0" Q5B6="0"/>
+          <Item5C Q5C1="0" Q5C2="0"/>
+          <Item5D Q5DA1="43" Q5DA3="33708969" Q5DB1="91" Q5DB3="291701281" Q5DC1="0" Q5DC3="0" Q5DD1="1" Q5DD3="25073834" Q5DE1="0" Q5DE3="0" Q5DF1="0" Q5DF3="0" Q5DG1="0" Q5DG3="0" Q5DH1="7" Q5DH3="78054619" Q5DI1="0" Q5DI3="0" Q5DJ1="0" Q5DJ3="0" Q5DK1="0" Q5DK3="0" Q5DL1="0" Q5DL3="0" Q5DM2="Fewer than 5 clients" Q5DM3="29556" Q5DN1="0" Q5DN3="0"/>
+          <Item5E Q5E1="Y" Q5E2="N" Q5E3="N" Q5E4="N" Q5E5="N" Q5E6="N" Q5E7="N"/>
+          <Item5F Q5F1="Y" Q5F2A="428568259" Q5F2B="0" Q5F2C="428568259" Q5F2D="254" Q5F2E="0" Q5F2F="254" Q5F3="0"/>
+          <Item5G Q5G1="N" Q5G2="Y" Q5G3="Y" Q5G4="N" Q5G5="Y" Q5G6="N" Q5G7="N" Q5G8="N" Q5G9="N" Q5G10="N" Q5G11="N" Q5G12="N"/>
+          <Item5H/>
+          <Item5I Q5I1="N"/>
+          <Item5J Q5J1="N" Q5J2="N"/>
+          <Item5K Q5K1="Y" Q5K2="N" Q5K3="N" Q5K4="Y"/>
+          <Item5L Q5L1A="N" Q5L1B="N" Q5L1C="N" Q5L1D="N" Q5L1E="N" Q5L3="N" Q5L4="N"/>
+          <Item6A/>
+          <Item6B Q6B1="N" Q6B3="N"/>
+          <Item7A/>
+          <Item7B Q7B="N"/>
+          <Item8A Q8A1="N" Q8A2="Y" Q8A3="Y"/>
+          <Item8B Q8B1="N" Q8B2="N" Q8B3="N"/>
+          <Item8C Q8C1="Y" Q8C2="Y" Q8C3="Y" Q8C4="Y"/>
+          <Item8D Q8D="N"/>
+          <Item8E Q8E="N"/>
+          <Item8F/>
+          <Item8G Q8G1="Y" Q8G2="Y"/>
+          <Item8H Q8H1="N" Q8H2="N"/>
+          <Item8I Q8I="N"/>
+          <Item9A Q9A1A="N" Q9A1B="N"/>
+          <Item9B Q9B1A="N" Q9B1B="N"/>
+          <Item9C Q9C1="N" Q9C2="N" Q9C3="N" Q9C4="N"/>
+          <Item9D Q9D1="N" Q9D2="N"/>
+          <Item9E/>
+          <Item9F/>
+          <Item10A Q10A="N"/>
+          <Item11 Q11="N"/>
+          <Item11A Q11A1="N" Q11A2="N"/>
+          <Item11B Q11B1="N" Q11B2="N"/>
+          <Item11C Q11C1="N" Q11C2="N" Q11C3="N" Q11C4="N" Q11C5="N"/>
+          <Item11D Q11D1="N" Q11D2="N" Q11D3="N" Q11D4="N" Q11D5="N"/>
+          <Item11E Q11E1="N" Q11E2="N" Q11E3="N" Q11E4="N"/>
+          <Item11F Q11F="N"/>
+          <Item11G Q11G="N"/>
+          <Item11H Q11H1A="N" Q11H1B="N" Q11H1C="N" Q11H2="N"/>
+        </Part1A>
+      </FormInfo>
+    </Firm>
