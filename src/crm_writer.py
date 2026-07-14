@@ -13,6 +13,7 @@ import csv
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 from abc import ABC, abstractmethod
@@ -122,6 +123,15 @@ class AirtableCRMWriter(CRMWriter):
                   "AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE in the environment.")
             return {"skipped": True, "reason": "missing credentials"}
 
+        # Free-tier guard: Airtable Free caps a base at 1,000 records total.
+        # Set AIRTABLE_IN_RADIUS_ONLY=1 to upsert only in-radius firms (~111)
+        # and leave room for Interactions / Compliance Log records.
+        if os.environ.get("AIRTABLE_IN_RADIUS_ONLY"):
+            before = len(records)
+            records = [r for r in records if r.get("in_radius")]
+            print("AirtableCRMWriter: AIRTABLE_IN_RADIUS_ONLY set -- upserting "
+                  "%d in-radius firms (of %d total)." % (len(records), before))
+
         url = "https://api.airtable.com/v0/%s/%s" % (self.base_id, self.table)
         ordered = sorted(records, key=lambda r: r.get("crd") or "")
         batches_sent = 0
@@ -145,6 +155,19 @@ class AirtableCRMWriter(CRMWriter):
                 )
                 urllib.request.urlopen(req, timeout=30)
                 batches_sent += 1
+                time.sleep(0.25)  # stay well under Airtable's 5 req/s per-base limit
+        except urllib.error.HTTPError as exc:
+            # Surface Airtable's error body -- a 422 here usually means a field
+            # name/type mismatch between _fields_for() and the base schema.
+            detail = ""
+            try:
+                detail = exc.read().decode("utf-8", "replace")[:500]
+            except Exception:
+                pass
+            print("AirtableCRMWriter: Airtable rejected batch %d (HTTP %s): %s"
+                  % (batches_sent + 1, exc.code, detail))
+            return {"skipped": True, "reason": "http %s" % exc.code,
+                    "batches_sent": batches_sent, "detail": detail}
         except urllib.error.URLError as exc:
             print("AirtableCRMWriter: network unavailable, skipping upsert (%s)" % exc)
             return {"skipped": True, "reason": "network"}

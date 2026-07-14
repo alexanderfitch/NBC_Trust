@@ -91,3 +91,13 @@ No individual ages exist anywhere in the firm-level feeds (none are collected on
 no-age constraint is structurally satisfied; the readiness proxy is firm tenure + size only, and
 `band_label` is a text label with no numbers. The rep-level feed (IA_INDVL) contains exam dates
 that could proxy individual age — deliberately NOT ingested in Phase 1.
+
+## D-015 · 2026-07-14 · Phase 2 on Airtable Free, schema as code
+Client testing Phase 1 end-to-end on Airtable's free tier. Consequences: (1) base capped at
+1,000 records → added `AIRTABLE_IN_RADIUS_ONLY` env flag so the upsert loads the 111 in-radius
+firms, not all 867; (2) API calls run from the user's own terminal (build sandbox has no network,
+D-003) — which also keeps the token off this machine entirely; (3) the base schema is created by
+`scripts/setup_airtable.py` via the Meta API (config-as-code, reproducible) rather than hand-built;
+views/automations are manual (no public API) per docs/PHASE2_AIRTABLE.md. The 13 stage names are
+provisional placeholders for Mark to rename in place. Writer hardened for user-run testing:
+surfaces Airtable 422 error bodies and spaces batches 0.25s under the 5 req/s limit.
