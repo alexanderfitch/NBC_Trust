@@ -1,0 +1,312 @@
+<meta charset="utf-8">
+<title>NBC Trust — Prospect Universe</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --s-state: #2a78d6; --s-sec: #eb6834; --s-era: #1baf7a;
+    --seq-100:#cde2fb; --seq-200:#9ec5f4; --seq-300:#6da7ec; --seq-400:#3987e5;
+    --seq-500:#256abf; --seq-600:#184f95; --seq-700:#0d366b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19;
+      --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --s-state: #3987e5; --s-sec: #d95926; --s-era: #199e70;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19;
+    --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --s-state: #3987e5; --s-sec: #d95926; --s-era: #199e70;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --s-state: #2a78d6; --s-sec: #eb6834; --s-era: #1baf7a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 28px clamp(16px, 4vw, 48px) 56px;
+  }
+  header { max-width: 1200px; margin: 0 auto 20px; }
+  .eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+  h1 { font-size: 22px; margin: 0 0 4px; text-wrap: balance; }
+  .sub { color: var(--ink-2); margin: 0; font-size: 13px; }
+  .wrap { max-width: 1200px; margin: 0 auto; display: grid; gap: 14px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+  .tile { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 14px 16px; }
+  .tile .v { font-size: 30px; font-weight: 650; line-height: 1.1; }
+  .tile .l { color: var(--ink-2); font-size: 12px; margin-top: 3px; }
+  .tile .h { color: var(--muted); font-size: 11px; margin-top: 5px; }
+
+  .panels { display: grid; grid-template-columns: minmax(380px, 7fr) minmax(300px, 5fr); gap: 14px; }
+  @media (max-width: 880px) { .panels { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 16px; min-width: 0; }
+  .panel h2 { font-size: 13px; font-weight: 600; margin: 0 0 2px; }
+  .panel .note { color: var(--muted); font-size: 11.5px; margin: 0 0 10px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); margin: 6px 0 8px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font: 11px system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+  .tablewrap { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 16px; }
+  .scroller { overflow: auto; max-height: 460px; border-top: 1px solid var(--grid); margin-top: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  th { position: sticky; top: 0; background: var(--surface); text-align: left; color: var(--muted);
+       font-size: 11px; letter-spacing: .05em; text-transform: uppercase; font-weight: 600;
+       padding: 8px 10px 6px; border-bottom: 1px solid var(--axis); white-space: nowrap; }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  th.num { text-align: right; }
+  .firm { font-weight: 600; }
+  .band { color: var(--ink-2); font-size: 11.5px; }
+  .pill { display: inline-block; min-width: 20px; text-align: center; border-radius: 999px;
+          font-weight: 650; font-size: 11.5px; padding: 1px 7px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+  #tip { position: fixed; pointer-events: none; z-index: 10; background: var(--surface); color: var(--ink);
+         border: 1px solid var(--ring); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.18);
+         padding: 8px 10px; font-size: 12px; max-width: 260px; display: none; }
+  #tip .t { font-weight: 650; margin-bottom: 2px; }
+  #tip .m { color: var(--ink-2); }
+  footer { max-width: 1200px; margin: 18px auto 0; color: var(--muted); font-size: 11.5px; }
+</style>
+
+<header>
+  <p class="eyebrow">NBC Trust · Honorable Exit engine · Phase 1</p>
+  <h1>Advisor prospect universe — 90 miles of Lincoln, NE</h1>
+  <p class="sub">SEC Form ADV / IAPD compilation feeds, as of July 14, 2026 · 111 firms in radius · internal research view</p>
+</header>
+
+<div class="wrap">
+  <div class="tiles" id="tiles"></div>
+
+  <div class="panels">
+    <div class="panel">
+      <h2>Where the firms are</h2>
+      <p class="note">Dot area ∝ regulatory AUM (hollow = AUM not filed). Rings at 30 / 60 / 90 miles from Lincoln.</p>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--s-state)"></span>State-registered RIA</span>
+        <span><span class="sw" style="background:var(--s-sec)"></span>SEC-registered RIA</span>
+        <span><span class="sw" style="background:var(--s-era)"></span>Exempt reporting</span>
+      </div>
+      <svg id="map" viewBox="0 0 640 560" role="img" aria-label="Map of advisory firms within 90 miles of Lincoln, Nebraska"></svg>
+    </div>
+
+    <div style="display:grid; gap:14px; min-width:0;">
+      <div class="panel">
+        <h2>Fit × readiness</h2>
+        <p class="note">Firm count per score pair — the top-right corner is the call list.</p>
+        <svg id="matrix" viewBox="0 0 320 260" role="img" aria-label="Heatmap of fit versus readiness scores"></svg>
+      </div>
+      <div class="panel">
+        <h2>AUM distribution</h2>
+        <p class="note">The $25–125M sweet spot is where state registration dominates.</p>
+        <svg id="aum" viewBox="0 0 340 250" role="img" aria-label="Bar chart of firms by AUM band and registration type"></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="tablewrap">
+    <h2 style="font-size:13px; margin:0 0 2px;">All 111 in-radius firms, ranked</h2>
+    <p class="note" style="color:var(--muted); font-size:11.5px; margin:0;">Sorted by fit + readiness, then AUM. Relationship score is manual and lives in Airtable.</p>
+    <div class="scroller"><table id="tbl">
+      <thead><tr>
+        <th>#</th><th>Firm</th><th>City</th><th class="num">Miles</th><th class="num">AUM</th>
+        <th class="num">Emp / IARs</th><th class="num">Fit</th><th class="num">Ready</th>
+        <th class="num">Since</th><th>Band</th>
+      </tr></thead><tbody></tbody>
+    </table></div>
+  </div>
+</div>
+
+<footer>
+  Source: IAPD SEC + State compilation feeds (public U.S. government data) · geocoding: U.S. Census Bureau ·
+  distances are straight-line · scores are rules-based research signals, not recommendations ·
+  no individual ages are used or shown anywhere in this system.
+</footer>
+
+<div id="tip"></div>
+
+<script>
+const FIRMS = [{"n":"Mjb Financial Planning","c":"Lincoln","lat":40.797028458903,"lon":-96.624900944727,"d":4.2,"a":60239269,"e":2,"i":1,"f":5,"r":5,"b":"long-tenured, small team, single-adviser, clean record, sweet-spot AUM","t":"STATE","y":"2006","crd":"141373"},{"n":"Strategic Asset Management, LLC","c":"Belleville","lat":39.822552852,"lon":-97.629163755053,"d":84.1,"a":35554580,"e":2,"i":2,"f":5,"r":5,"b":"long-tenured, small team, clean record, sweet-spot AUM","t":"STATE","y":"1998","crd":"115893"},{"n":"Modern Asset Management LLC","c":"Columbus","lat":41.430045169062,"lon":-97.356803822844,"d":54.5,"a":30315081,"e":1,"i":1,"f":5,"r":5,"b":"long-tenured, small team, single-adviser, clean record, sweet-spot AUM","t":"STATE","y":"2000","crd":"128768"},{"n":"Evergreen Capital Management Inc.","c":"Omaha","lat":41.268125431792,"lon":-96.062041925243,"d":45.8,"a":30200000,"e":1,"i":1,"f":5,"r":5,"b":"long-tenured, small team, single-adviser, clean record, sweet-spot AUM","t":"STATE","y":"2006","crd":"104670"},{"n":"Guide Rock Capital Management, Inc.","c":"Omaha","lat":41.270908596732,"lon":-95.924907742823,"d":51.4,"a":41014456,"e":2,"i":2,"f":5,"r":4,"b":"established, small team, clean record, sweet-spot AUM","t":"STATE","y":"2009","crd":"149820"},{"n":"Afsc Advisors, Inc.","c":"Council Bluffs","lat":41.262497260365,"lon":-95.84510420501,"d":54.4,"a":36547893,"e":1,"i":1,"f":5,"r":4,"b":"established, small team, single-adviser, clean record, sweet-spot AUM","t":"STATE","y":"2016","crd":"281467"},{"n":"Pflug Koory, LLC","c":"Omaha","lat":41.208378523953996,"lon":-96.08783816705333,"d":42.1,"a":346958057,"e":2,"i":2,"f":3,"r":5,"b":"long-tenured, small team, clean record","t":"SEC","y":"2000","crd":"109268"},{"n":"Walnut Private Equity Partners, LLC","c":"Omaha","lat":41.263145772809,"lon":-96.049584253244,"d":46.1,"a":172610119,"e":3,"i":2,"f":4,"r":4,"b":"established, small team, clean record","t":"SEC","y":"2013","crd":"168840"},{"n":"Financial Design Group, LLC","c":"Lavista","lat":41.185432265124,"lon":-96.100584435477,"d":40.6,"a":113390453,"e":3,"i":2,"f":5,"r":3,"b":"small team, clean record, sweet-spot AUM","t":"SEC","y":"2025","crd":"316103"},{"n":"Sanders Retirement Planning LLC","c":"Omaha","lat":41.23973420421,"lon":-96.014570763264,"d":46.4,"a":62342950,"e":2,"i":2,"f":5,"r":3,"b":"small team, clean record, sweet-spot AUM","t":"STATE","y":"2024","crd":"333590"},{"n":"Cws Wealth Partners","c":"Omaha","lat":41.249472201536,"lon":-96.100953531667,"d":43.5,"a":62000000,"e":2,"i":2,"f":5,"r":3,"b":"small team, clean record, sweet-spot AUM","t":"STATE","y":"2021","crd":"316112"},{"n":"Professional Retirement Strategies LLC","c":"Omaha","lat":41.221659310966,"lon":-96.143128728358,"d":40.6,"a":52142739,"e":2,"i":2,"f":5,"r":3,"b":"small team, clean record, sweet-spot AUM","t":"STATE","y":"2017","crd":"287808"},{"n":"Planvest, LLC","c":"Blair","lat":41.54380442863,"lon":-96.134927418655,"d":58.5,"a":46677159,"e":1,"i":1,"f":5,"r":3,"b":"small team, single-adviser, clean record, sweet-spot AUM","t":"STATE","y":"2020","crd":"309669"},{"n":"Plains Advisory LLC","c":"Grand Island","lat":40.927198294084,"lon":-98.38413968467,"d":88.2,"a":28878556,"e":1,"i":1,"f":5,"r":3,"b":"small team, single-adviser, clean record, sweet-spot AUM","t":"STATE","y":"2019","crd":"300110"},{"n":"Whitetail Rock Capital Management, LLC","c":"Lincoln","lat":40.813325911511,"lon":-96.70267564533,"d":0.0,"a":3278847169,"e":3,"i":2,"f":3,"r":4,"b":"established, small team, clean record","t":"SEC","y":"2011","crd":"156675"},{"n":"The Magnolia Group, LLC","c":"Omaha","lat":41.259652968102,"lon":-95.937229375418,"d":50.4,"a":710597605,"e":2,"i":2,"f":3,"r":4,"b":"established, small team, clean record","t":"SEC","y":"2014","crd":"171102"},{"n":"Arnold Weitz & Co","c":"Elkhorn","lat":41.280791060104,"lon":-96.237534853934,"d":40.4,"a":438072517,"e":2,"i":2,"f":3,"r":4,"b":"established, small team, clean record","t":"SEC","y":"2009","crd":"108026"},{"n":"True Measure Wealth Management","c":"Omaha","lat":41.258862420703,"lon":-96.198527952449,"d":40.5,"a":241547365,"e":2,"i":1,"f":2,"r":5,"b":"long-tenured, small team, single-adviser","t":"SEC","y":"2001","crd":"116265"},{"n":"Ellerbrock-Norris Wealth Strategies LLC","c":"Omaha","lat":41.297659735979,"lon":-96.15878665097,"d":43.8,"a":171618658,"e":2,"i":2,"f":4,"r":3,"b":"small team, clean record","t":"SEC","y":"2025","crd":"295099"},{"n":"Intentional Retirement, LLC","c":"Omaha","lat":41.229913905249,"lon":-96.180956991627,"d":39.6,"a":150000352,"e":2,"i":1,"f":4,"r":3,"b":"small team, single-adviser, clean record","t":"SEC","y":"2024","crd":"310655"},{"n":"Paradigm Wealth Management","c":"Lincoln","lat":40.813354020088,"lon":-96.602770813514,"d":5.2,"a":116334723,"e":8,"i":2,"f":5,"r":2,"b":"clean record, sweet-spot AUM","t":"SEC","y":"2019","crd":"282055"},{"n":"Clark Wealth Strategies, Inc.","c":"Omaha","lat":41.276921491789,"lon":-96.233292634853,"d":40.3,"a":53000000,"e":5,"i":4,"f":5,"r":2,"b":"established, clean record, sweet-spot AUM","t":"STATE","y":"2008","crd":"146090"},{"n":"Teckmeyer Financial Services, LLC","c":"Omaha","lat":41.209956605901,"lon":-96.086893992159,"d":42.2,"a":51602611,"e":7,"i":3,"f":4,"r":3,"b":"long-tenured, sweet-spot AUM","t":"STATE","y":"2006","crd":"39000"},{"n":"Spiehs Wealth Management, Inc.","c":"Grand Island","lat":40.922371467283256,"lon":-98.38108422115975,"d":88.0,"a":32000000,"e":1,"i":1,"f":4,"r":3,"b":"small team, single-adviser, sweet-spot AUM","t":"STATE","y":"2023","crd":"328455"},{"n":"Virtue Wealth Counsel, LLC","c":"Omaha","lat":41.240147062686,"lon":-96.179762183182,"d":40.1,"a":30821589,"e":3,"i":3,"f":5,"r":2,"b":"small team, clean record, sweet-spot AUM","t":"STATE","y":"2018","crd":"298592"},{"n":"Carlson Wealth, LLC","c":"Omaha","lat":41.20975442201,"lon":-96.087223477039,"d":42.2,"a":29529556,"e":4,"i":1,"f":5,"r":2,"b":"single-adviser, clean record, sweet-spot AUM","t":"STATE","y":"2022","crd":"318362"},{"n":"Executive Wealth Partners","c":"Omaha","lat":41.268938693854,"lon":-96.065656046825,"d":45.7,"a":18302406,"e":2,"i":1,"f":4,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2018","crd":"297608"},{"n":"Ils Financial, LLC","c":"Omaha","lat":41.258268542405,"lon":-96.193846773286,"d":40.6,"a":12751904,"e":1,"i":1,"f":4,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2024","crd":"331725"},{"n":"Thomas Jackson Family Office, Inc.","c":"Omaha","lat":41.23782830757,"lon":-96.011043257021,"d":46.5,"a":null,"e":2,"i":1,"f":3,"r":4,"b":"established, small team, single-adviser, clean record","t":"STATE","y":"2012","crd":"127918"},{"n":"Sipherd Wealth Management, LLC","c":"Lincoln","lat":40.813356668776,"lon":-96.603023761679,"d":5.2,"a":null,"e":3,"i":1,"f":3,"r":4,"b":"established, small team, single-adviser, clean record","t":"STATE","y":"2010","crd":"150011"},{"n":"Legacy Estate Planning Group, Inc.","c":"Omaha","lat":41.249715308319,"lon":-96.027858560318,"d":46.3,"a":null,"e":1,"i":1,"f":3,"r":4,"b":"established, small team, single-adviser, clean record","t":"STATE","y":"2010","crd":"152422"},{"n":"Prodigy Asset Management LLC","c":"Omaha","lat":41.266148272081,"lon":-96.129857987998,"d":43.2,"a":2435740783,"e":9,"i":5,"f":3,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1993","crd":"106457"},{"n":"Cambridge Advisors Inc.","c":"Omaha","lat":41.232684109623,"lon":-96.185649625532,"d":39.6,"a":693511589,"e":6,"i":6,"f":3,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1990","crd":"104851"},{"n":"America First Investment Advisors LLC","c":"Omaha","lat":41.260621312922,"lon":-96.069702355567,"d":45.2,"a":665144120,"e":7,"i":7,"f":3,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1992","crd":"106984"},{"n":"Westchester Capital Management Inc.","c":"Omaha","lat":41.267653935749,"lon":-96.062041215669,"d":45.8,"a":556302985,"e":7,"i":3,"f":3,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1986","crd":"110961"},{"n":"Lawson Kroeker Investment Management Inc.","c":"Omaha","lat":41.241186176274,"lon":-96.014712250817,"d":46.5,"a":428568259,"e":7,"i":4,"f":3,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1986","crd":"105053"},{"n":"Nabity-Jensen Investment Management, Inc.","c":"Omaha","lat":41.268938693854,"lon":-96.065656046825,"d":45.7,"a":258453250,"e":3,"i":2,"f":3,"r":3,"b":"small team, clean record","t":"SEC","y":"2020","crd":"128455"},{"n":"Capital Consulting & Asset Management","c":"Lincoln","lat":40.81412984614,"lon":-96.709880358086,"d":0.4,"a":218676079,"e":8,"i":3,"f":3,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1996","crd":"41438"},{"n":"Agman Capital","c":"Omaha","lat":41.232166348195,"lon":-96.109462382015,"d":42.3,"a":140197963,"e":3,"i":3,"f":4,"r":2,"b":"small team, clean record","t":"SEC","y":"2025","crd":"334799"},{"n":"Fairway Asset Management, LLC","c":"Omaha","lat":41.236473181233,"lon":-96.1880178513,"d":39.7,"a":117360392,"e":4,"i":3,"f":5,"r":1,"b":"clean record, sweet-spot AUM","t":"SEC","y":"2025","crd":"146636"},{"n":"Convergence Advisory Group","c":"Omaha","lat":41.249472201536,"lon":-96.100953531667,"d":43.5,"a":104549298,"e":6,"i":5,"f":5,"r":1,"b":"clean record, sweet-spot AUM","t":"STATE","y":"2020","crd":"308408"},{"n":"Lexus Wealth Management","c":"Omaha","lat":41.267242953401,"lon":-96.091457666532,"d":44.7,"a":42263886,"e":3,"i":3,"f":4,"r":2,"b":"small team, sweet-spot AUM","t":"STATE","y":"2023","crd":"325200"},{"n":"Andorra Capital","c":"Omaha","lat":41.267292852709,"lon":-96.116803340551,"d":43.8,"a":9942400,"e":5,"i":3,"f":3,"r":3,"b":"long-tenured, clean record","t":"STATE","y":"2003","crd":"127045"},{"n":"Maxus Wealth Management LLC","c":"Seward","lat":40.907734582566,"lon":-97.099303074015,"d":21.7,"a":5918217,"e":2,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2024","crd":"333825"},{"n":"Vogel Wealth Management, LLC","c":"Omaha","lat":41.205424543951,"lon":-96.089397031962,"d":41.9,"a":5332097,"e":2,"i":2,"f":3,"r":3,"b":"small team, clean record","t":"STATE","y":"2023","crd":"326498"},{"n":"Turner Financial","c":"Omaha","lat":41.23183330132,"lon":-96.085495232758,"d":43.2,"a":5031468,"e":1,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2025","crd":"334842"},{"n":"Alba Financial LLC","c":"Council Bluffs","lat":41.260742530911,"lon":-95.848858993096,"d":54.2,"a":3802379,"e":1,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2023","crd":"327309"},{"n":"Brokerage Specialists","c":"Grand Island","lat":40.938007985532,"lon":-98.378725570669,"d":88.0,"a":0,"e":2,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2017","crd":"291011"},{"n":"P23 Financial, Inc.","c":"Lincoln","lat":40.811803024279,"lon":-96.625239992355,"d":4.0,"a":null,"e":1,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2018","crd":"291112"},{"n":"Moat Capital","c":"Omaha","lat":41.248962179266,"lon":-95.929238747482,"d":50.3,"a":0,"e":1,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2024","crd":"313152"},{"n":"Fit Wealth","c":"Grand Island","lat":40.938007985532,"lon":-98.378725570669,"d":88.0,"a":0,"e":2,"i":2,"f":3,"r":3,"b":"small team, clean record","t":"STATE","y":"2026","crd":"315858"},{"n":"Fat 5 Investments, LLC","c":"Omaha","lat":41.233047538782,"lon":-96.164960731529,"d":40.3,"a":null,"e":1,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2022","crd":"318838"},{"n":"Moyer Financials LLC","c":"Omaha","lat":41.234686467353,"lon":-96.105762019327,"d":42.6,"a":null,"e":1,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2026","crd":"340367"},{"n":"Skyline Wealth Management","c":"Hastings","lat":40.58557256185,"lon":-98.392495894271,"d":89.9,"a":0,"e":1,"i":1,"f":3,"r":3,"b":"small team, single-adviser, clean record","t":"STATE","y":"2026","crd":"342275"},{"n":"Orion Portfolio Solutions, LLC","c":"Omaha","lat":41.232490473174,"lon":-96.190449667914,"d":39.4,"a":64842135351,"e":305,"i":47,"f":2,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"2000","crd":"107975"},{"n":"Ameritas Investment Partners, Inc.","c":"Lincoln","lat":40.816961867574,"lon":-96.640080426117,"d":3.3,"a":29007591987,"e":51,"i":33,"f":2,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1998","crd":"109381"},{"n":"Bridges Investment Management Inc.","c":"Omaha","lat":41.26552911726,"lon":-96.121285240375,"d":43.5,"a":11307553900,"e":79,"i":30,"f":2,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1999","crd":"108028"},{"n":"Weitz Investment Management, Inc.","c":"Omaha","lat":41.257667914522,"lon":-95.964854401637,"d":49.2,"a":8079865642,"e":36,"i":13,"f":2,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"1983","crd":"105088"},{"n":"Lutz Financial","c":"Omaha","lat":41.265282984264,"lon":-96.126204208248,"d":43.3,"a":3187194167,"e":23,"i":15,"f":2,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"2003","crd":"117273"},{"n":"Pittenger & Anderson Inc.","c":"Lincoln","lat":40.757313201492,"lon":-96.682642254877,"d":4.0,"a":3034066574,"e":14,"i":14,"f":2,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"2000","crd":"111033"},{"n":"Allen Capital Group, LLC","c":"Grand Island","lat":40.886271603985,"lon":-98.382746058631,"d":88.0,"a":1501556085,"e":38,"i":21,"f":2,"r":3,"b":"long-tenured, clean record","t":"SEC","y":"2005","crd":"135879"},{"n":"Lincoln Capital, LLC","c":"Lincoln","lat":40.754892575736,"lon":-96.639574092921,"d":5.2,"a":844751520,"e":9,"i":4,"f":3,"r":2,"b":"established, clean record","t":"SEC","y":"2013","crd":"168307"},{"n":"Hiley Hunt Wealth Management, Inc.","c":"Omaha","lat":41.26899167634,"lon":-96.066381431326,"d":45.7,"a":289551810,"e":3,"i":3,"f":3,"r":2,"b":"small team, clean record","t":"SEC","y":"2019","crd":"164942"},{"n":"Bazis Private Wealth, LLC","c":"Omaha","lat":41.252476324677,"lon":-96.178089940269,"d":40.8,"a":244134828,"e":5,"i":4,"f":3,"r":2,"b":"established, clean record","t":"SEC","y":"2016","crd":"148605"},{"n":"R2 Wealth Management Partners","c":"Lincoln","lat":40.813787080497,"lon":-96.815227781091,"d":5.9,"a":236037275,"e":3,"i":3,"f":3,"r":2,"b":"small team, clean record","t":"SEC","y":"2025","crd":"338490"},{"n":"Invisor","c":"Seneca","lat":39.834311278638,"lon":-96.058993176891,"d":75.7,"a":198543563,"e":4,"i":4,"f":4,"r":1,"b":"clean record","t":"SEC","y":"2025","crd":"174890"},{"n":"Panorama Point Partners, LLC","c":"Omaha","lat":41.247365057413,"lon":-96.115667342699,"d":42.8,"a":178099273,"e":11,"i":7,"f":3,"r":2,"b":"established, clean record","t":"SEC","y":"2015","crd":"165704"},{"n":"Leibman Financial Servces, Inc.","c":"Louisville","lat":41.000666344392,"lon":-96.16191609049,"d":31.1,"a":173132598,"e":4,"i":4,"f":4,"r":1,"b":"clean record","t":"SEC","y":"2022","crd":"323120"},{"n":"Garnett Investment Strategies","c":"Beatrice","lat":40.266091691512,"lon":-96.71665767079,"d":37.8,"a":157985357,"e":5,"i":2,"f":3,"r":2,"b":"","t":"SEC","y":"2024","crd":"282370"},{"n":"Allstate Financial Advisors, LLC","c":"Lincoln","lat":40.814229080161,"lon":-96.710030941997,"d":0.4,"a":142352226,"e":341,"i":0,"f":2,"r":3,"b":"established, single-adviser","t":"SEC","y":"2007","crd":"109524"},{"n":"Adaptive Advice, LLC","c":"Omaha","lat":41.254453351857,"lon":-96.073857591392,"d":44.7,"a":8289099,"e":4,"i":2,"f":3,"r":2,"b":"clean record","t":"STATE","y":"2020","crd":"310529"},{"n":"Well Advised, LLC","c":"Omaha","lat":41.270152512407,"lon":-96.093487301417,"d":44.8,"a":6035511,"e":1,"i":1,"f":2,"r":3,"b":"small team, single-adviser","t":"STATE","y":"2023","crd":"326148"},{"n":"The Premier Advisory Group, LLC","c":"Omaha","lat":41.286736738453,"lon":-96.099531143631,"d":45.3,"a":null,"e":4,"i":4,"f":3,"r":2,"b":"established, clean record","t":"STATE","y":"2014","crd":"173071"},{"n":"Agsn Investments, LLC","c":"Omaha","lat":41.249570061201,"lon":-96.179499436785,"d":40.6,"a":null,"e":4,"i":1,"f":3,"r":2,"b":"single-adviser, clean record","t":"STATE","y":"2025","crd":"337967"},{"n":"Cwm, LLC","c":"Omaha","lat":41.26256297754479,"lon":-96.10620667341585,"d":43.9,"a":50579657663,"e":1416,"i":472,"f":2,"r":2,"b":"established, clean record","t":"SEC","y":"2011","crd":"155344"},{"n":"Ameritas Advisory Services, LLC","c":"Lincoln","lat":40.813517063396,"lon":-96.639425253057,"d":3.3,"a":13746443625,"e":797,"i":366,"f":1,"r":3,"b":"long-tenured","t":"SEC","y":"1998","crd":"317245"},{"n":"Mutual Advisors, LLC","c":"Omaha","lat":41.26340032529,"lon":-96.054759683647,"d":45.9,"a":8545398177,"e":208,"i":158,"f":2,"r":2,"b":"established, clean record","t":"SEC","y":"2013","crd":"167658"},{"n":"Avior Wealth Management, LLC","c":"Omaha","lat":41.26256297754479,"lon":-96.10620667341585,"d":43.9,"a":6464235428,"e":170,"i":125,"f":2,"r":2,"b":"established, clean record","t":"SEC","y":"2008","crd":"148674"},{"n":"M-One Capital","c":"Omaha","lat":41.259652968102,"lon":-95.937229375418,"d":50.4,"a":3773994241,"e":31,"i":28,"f":2,"r":2,"b":"established, clean record","t":"SEC","y":"2011","crd":"158782"},{"n":"Carson Group Investing","c":"Omaha","lat":41.26256297754479,"lon":-96.10620667341585,"d":43.9,"a":2048522707,"e":7,"i":7,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2018","crd":"291744"},{"n":"Tributary Capital Management, LLC","c":"Omaha","lat":41.259652968102,"lon":-95.937229375418,"d":50.4,"a":1900964335,"e":19,"i":13,"f":1,"r":3,"b":"long-tenured","t":"SEC","y":"2001","crd":"112528"},{"n":"Ironvine Capital Partners, LLC","c":"Omaha","lat":41.263410189951,"lon":-96.057117394704,"d":45.8,"a":1143727875,"e":5,"i":5,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2017","crd":"168892"},{"n":"Arkfeld Wealth Strategies, LLC","c":"Omaha","lat":41.290623370338,"lon":-96.168748321327,"d":43.1,"a":537974000,"e":8,"i":5,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2018","crd":"293175"},{"n":"Flagstone Financial Management, LLC","c":"Lincoln","lat":40.738276132579,"lon":-96.642896751025,"d":6.1,"a":467767160,"e":11,"i":5,"f":2,"r":2,"b":"established, clean record","t":"SEC","y":"2016","crd":"285484"},{"n":"Morey & Quinn Wealth Partners","c":"Omaha","lat":41.260704277313,"lon":-96.087910249901,"d":44.5,"a":373428329,"e":4,"i":3,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2024","crd":"332074"},{"n":"Wealth Advisors Network, Inc.","c":"Hastings","lat":40.64305370707,"lon":-98.382590414485,"d":88.7,"a":300252270,"e":8,"i":8,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2017","crd":"113836"},{"n":"Cornerstone Financial Group,LLC","c":"Omaha","lat":41.260704277313,"lon":-96.087910249901,"d":44.5,"a":292238045,"e":7,"i":5,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2025","crd":"129246"},{"n":"Hbe Wealth Management, LLC","c":"Lincoln","lat":40.739176764388,"lon":-96.646418912977,"d":5.9,"a":277436368,"e":5,"i":5,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2020","crd":"128315"},{"n":"Revolution Capital, LLC","c":"Omaha","lat":41.258268542405,"lon":-96.193846773286,"d":40.6,"a":241915426,"e":8,"i":4,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2024","crd":"300496"},{"n":"Blue Capital","c":"Omaha","lat":41.257843868438,"lon":-95.969471276261,"d":49.0,"a":200818353,"e":7,"i":4,"f":3,"r":1,"b":"clean record","t":"SEC","y":"2021","crd":"304083"},{"n":"Itm, Inc. (D/B/A Resource Consultants, Inc.)","c":"Omaha","lat":41.233234098479,"lon":-96.048603587044,"d":44.8,"a":null,"e":40,"i":1,"f":2,"r":2,"b":"single-adviser, clean record","t":"STATE","y":"2024","crd":"135472"},{"n":"Dundee Vc Management LLC","c":"Omaha","lat":41.257137567849,"lon":-95.96787091969,"d":49.0,"a":null,"e":null,"i":null,"f":2,"r":2,"b":"established, clean record","t":"ERA","y":"2016","crd":"164403"},{"n":"First National Advisers, LLC","c":"Omaha","lat":41.263723956258,"lon":-96.133276427474,"d":43.0,"a":7369671462,"e":35,"i":20,"f":1,"r":2,"b":"established","t":"SEC","y":"2015","crd":"277146"},{"n":"Private Wealth Asset Management","c":"Omaha","lat":41.260712043397,"lon":-95.930938501832,"d":50.7,"a":2523259243,"e":32,"i":22,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2021","crd":"315819"},{"n":"Wealthplan Investment Management LLC","c":"Omaha","lat":41.262160602578,"lon":-96.082421121531,"d":44.8,"a":2185239312,"e":34,"i":14,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2020","crd":"311364"},{"n":"Wealthplan Partners","c":"Omaha","lat":41.262160602578,"lon":-96.082421121531,"d":44.8,"a":1120185963,"e":56,"i":26,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2019","crd":"305026"},{"n":"Bellwether Wealth","c":"Lincoln","lat":40.81412984614,"lon":-96.709880358086,"d":0.4,"a":784024209,"e":12,"i":7,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2019","crd":"300012"},{"n":"Smart Wealth, LLC","c":"Omaha","lat":41.265834874393,"lon":-96.131951449029,"d":43.1,"a":632340216,"e":41,"i":17,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2021","crd":"315496"},{"n":"Stevens Capital Partners","c":"Omaha","lat":41.293388431581,"lon":-96.156627325029,"d":43.7,"a":600726359,"e":21,"i":10,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2022","crd":"317517"},{"n":"Sequent Planning, LLC","c":"Omaha","lat":41.26200362544,"lon":-96.043285215147,"d":46.3,"a":589473003,"e":102,"i":76,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2018","crd":"160381"},{"n":"Prairie Wealth Advisors, Inc.","c":"Omaha","lat":41.259376840623,"lon":-96.073448152908,"d":45.0,"a":557956158,"e":11,"i":9,"f":1,"r":2,"b":"established","t":"SEC","y":"2012","crd":"165266"},{"n":"Plan A Wealth, LLC","c":"Lincoln","lat":40.738505402141,"lon":-96.607998962042,"d":7.2,"a":433790573,"e":13,"i":6,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2017","crd":"287860"},{"n":"Interalpen Partners, LLC","c":"Omaha","lat":41.247365057413,"lon":-96.115667342699,"d":42.8,"a":273689471,"e":11,"i":7,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2025","crd":"315587"},{"n":"Keystone Financial Services, LLC","c":"Omaha","lat":41.268938693854,"lon":-96.065656046825,"d":45.7,"a":240320000,"e":11,"i":7,"f":2,"r":1,"b":"clean record","t":"SEC","y":"2021","crd":"308397"},{"n":"Kratky Capital Management, LLC","c":"Omaha","lat":41.275720214209,"lon":-96.17917250641,"d":42.0,"a":null,"e":null,"i":null,"f":2,"r":1,"b":"clean record","t":"ERA","y":"2017","crd":"291820"},{"n":"Fitz Roy Capital, LLC","c":"Lincoln","lat":40.732432094971,"lon":-96.603046636901,"d":7.7,"a":null,"e":null,"i":null,"f":2,"r":1,"b":"clean record","t":"ERA","y":"2020","crd":"307884"},{"n":"Grit Road Partners, LLC","c":"Omaha","lat":41.248795339852,"lon":-96.080876072632,"d":44.2,"a":null,"e":null,"i":null,"f":2,"r":1,"b":"clean record","t":"ERA","y":"2021","crd":"315792"},{"n":"Value Investing Capital Management, LLC.","c":"Omaha","lat":41.257667914522,"lon":-95.964854401637,"d":49.2,"a":null,"e":null,"i":null,"f":2,"r":1,"b":"clean record","t":"ERA","y":"2021","crd":"316655"},{"n":"Starkel Capital Management, Inc.","c":"Omaha","lat":41.277421014673,"lon":-96.213540019612,"d":40.9,"a":null,"e":null,"i":null,"f":2,"r":1,"b":"clean record","t":"ERA","y":"2022","crd":"323738"},{"n":"Boston Omaha Asset Management","c":"Omaha","lat":41.259652968102,"lon":-95.937229375418,"d":50.4,"a":null,"e":null,"i":null,"f":2,"r":1,"b":"clean record","t":"ERA","y":"2025","crd":"324144"},{"n":"Iams Wealth Management, LLC","c":"Omaha","lat":41.262893406986,"lon":-96.210039370835,"d":40.3,"a":397226191,"e":53,"i":53,"f":1,"r":1,"b":"","t":"SEC","y":"2017","crd":"286085"}];
+
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = () => ({ STATE: css('--s-state'), SEC: css('--s-sec'), ERA: css('--s-era') });
+const fmtAUM = a => a == null ? '—' :
+  a >= 1e9 ? '$' + (a/1e9).toFixed(1) + 'B' :
+  a >= 1e6 ? '$' + Math.round(a/1e6) + 'M' : '$' + Math.round(a/1e3) + 'K';
+
+/* ---------- stat tiles ---------- */
+const sweet = FIRMS.filter(f => f.a && f.a >= 25e6 && f.a <= 125e6);
+const hot   = FIRMS.filter(f => f.f >= 4 && f.r >= 4);
+const stateN = FIRMS.filter(f => f.t === 'STATE').length;
+document.getElementById('tiles').innerHTML = [
+  ['111', 'firms in radius', '64 SEC · 40 state · 7 ERA'],
+  [String(sweet.length), 'in the $25–125M sweet spot', sweet.filter(f=>f.t==='STATE').length + ' of them state-registered'],
+  [String(hot.length), 'priority prospects', 'fit ≥ 4 and readiness ≥ 4'],
+  [String(stateN), 'state-registered RIAs', 'invisible in SEC-only datasets'],
+].map(([v,l,h]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div><div class="h">${h}</div></div>`).join('');
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById('tip');
+function showTip(evt, html) {
+  tip.innerHTML = html; tip.style.display = 'block';
+  const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  if (x + w > innerWidth - 8) x = evt.clientX - w - pad;
+  if (y + h > innerHeight - 8) y = evt.clientY - h - pad;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+const hideTip = () => tip.style.display = 'none';
+const firmTip = f => `<div class="t">${f.n}</div>
+  <div class="m">${f.c} · ${f.d} mi · ${f.t === 'STATE' ? 'State RIA' : f.t === 'SEC' ? 'SEC RIA' : 'ERA'}</div>
+  <div class="m">AUM ${fmtAUM(f.a)} · ${f.e ?? '—'} employees · ${f.i ?? '—'} IARs</div>
+  <div class="m">Fit ${f.f} · Readiness ${f.r}${f.y ? ' · registered ' + f.y : ''}</div>`;
+
+/* ---------- map ---------- */
+(function map() {
+  const svg = document.getElementById('map');
+  const W = 640, H = 560, LAT = 40.8136, LON = -96.7026;
+  const cos = Math.cos(LAT * Math.PI / 180);
+  const MIPD = 69.0;                      // miles per degree latitude
+  const R = 97;                           // show a bit beyond the 90mi ring
+  const scale = Math.min(W, H) / 2 / R;   // px per mile
+  const X = f => W/2 + (f.lon - LON) * cos * MIPD * scale;
+  const Y = f => H/2 - (f.lat - LAT) * MIPD * scale;
+  let el = '';
+  // rings
+  [30, 60, 90].forEach(mi => {
+    el += `<circle cx="${W/2}" cy="${H/2}" r="${mi*scale}" fill="none" stroke="var(--grid)" stroke-width="1"/>`;
+    el += `<text x="${W/2 - mi*scale*0.7071 - 4}" y="${H/2 + mi*scale*0.7071 + 12}" text-anchor="end" fill="var(--muted)">${mi} mi</text>`;
+  });
+  // dots: draw larger AUM first so small dots stay clickable on top
+  const sorted = [...FIRMS].sort((a, b) => (b.a || 0) - (a.a || 0));
+  sorted.forEach((f, idx) => {
+    if (f.lat == null) return;
+    const r = f.a ? Math.max(3.5, Math.min(13, 1.4 * Math.sqrt(f.a / 1e6) / 2.2)) : 3.5;
+    const fill = f.a ? `fill="var(--s-${f.t.toLowerCase()})" fill-opacity="0.82"` : `fill="none"`;
+    el += `<circle data-i="${FIRMS.indexOf(f)}" cx="${X(f).toFixed(1)}" cy="${Y(f).toFixed(1)}" r="${r.toFixed(1)}"
+      ${fill} stroke="${f.a ? 'var(--surface)' : `var(--s-${f.t.toLowerCase()})`}" stroke-width="${f.a ? 1.5 : 1.6}"
+      style="cursor:pointer"/>`;
+  });
+  // labels last so they sit above the dots, with a surface halo
+  const halo = 'paint-order:stroke;stroke:var(--surface);stroke-width:3px;';
+  el += `<line x1="${W/2-6}" y1="${H/2}" x2="${W/2+6}" y2="${H/2}" stroke="var(--ink)" stroke-width="1.5"/>
+         <line x1="${W/2}" y1="${H/2-6}" x2="${W/2}" y2="${H/2+6}" stroke="var(--ink)" stroke-width="1.5"/>
+         <text x="${W/2+10}" y="${H/2+16}" fill="var(--ink-2)" font-weight="600" style="${halo}">Lincoln</text>`;
+  [['Omaha', 41.2565, -95.9345], ['Grand Island', 40.9264, -98.3420]]
+    .forEach(([name, la, lo]) => {
+      const x = W/2 + (lo - LON) * cos * MIPD * scale, y = H/2 - (la - LAT) * MIPD * scale;
+      el += `<text x="${x}" y="${y - 16}" text-anchor="middle" fill="var(--ink-2)" font-weight="600" style="${halo}">${name}</text>`;
+    });
+  svg.innerHTML = el;
+  svg.addEventListener('mousemove', e => {
+    const t = e.target.closest('circle[data-i]');
+    t ? showTip(e, firmTip(FIRMS[+t.dataset.i])) : hideTip();
+  });
+  svg.addEventListener('mouseleave', hideTip);
+})();
+
+/* ---------- fit × readiness heatmap ---------- */
+(function matrix() {
+  const svg = document.getElementById('matrix');
+  const counts = {};
+  FIRMS.forEach(f => counts[f.f + ',' + f.r] = (counts[f.f + ',' + f.r] || 0) + 1);
+  const max = Math.max(...Object.values(counts));
+  const ramp = ['--seq-100','--seq-200','--seq-300','--seq-400','--seq-500','--seq-600','--seq-700'];
+  const L = 34, T = 8, cell = 44, gap = 2;
+  let el = '';
+  for (let f = 1; f <= 5; f++) for (let r = 1; r <= 5; r++) {
+    const n = counts[f + ',' + r] || 0;
+    const x = L + (f - 1) * (cell + gap), y = T + (5 - r) * (cell + gap);
+    const step = n === 0 ? null : ramp[Math.min(6, Math.round((n / max) * 6))];
+    el += `<rect data-f="${f}" data-r="${r}" data-n="${n}" x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3"
+      fill="${step ? `var(${step})` : 'var(--surface)'}" stroke="var(--grid)" stroke-width="1"/>`;
+    if (n > 0) el += `<text x="${x + cell/2}" y="${y + cell/2 + 4}" text-anchor="middle"
+      fill="${n / max > 0.55 ? '#ffffff' : 'var(--ink)'}" font-weight="600" pointer-events="none">${n}</text>`;
+  }
+  for (let i = 1; i <= 5; i++) {
+    el += `<text x="${L + (i-1)*(cell+gap) + cell/2}" y="${T + 5*(cell+gap) + 14}" text-anchor="middle" fill="var(--muted)">${i}</text>`;
+    el += `<text x="${L - 8}" y="${T + (5-i)*(cell+gap) + cell/2 + 4}" text-anchor="end" fill="var(--muted)">${i}</text>`;
+  }
+  el += `<text x="${L + (5*(cell+gap))/2}" y="${T + 5*(cell+gap) + 32}" text-anchor="middle" fill="var(--ink-2)">Fit →</text>`;
+  el += `<text x="10" y="${T + (5*(cell+gap))/2}" text-anchor="middle" fill="var(--ink-2)" transform="rotate(-90 10 ${T + (5*(cell+gap))/2})">Readiness →</text>`;
+  svg.innerHTML = el;
+  svg.addEventListener('mousemove', e => {
+    const t = e.target.closest('rect[data-n]');
+    t ? showTip(e, `<div class="t">${t.dataset.n} firm${t.dataset.n==='1'?'':'s'}</div><div class="m">fit ${t.dataset.f} · readiness ${t.dataset.r}</div>`) : hideTip();
+  });
+  svg.addEventListener('mouseleave', hideTip);
+})();
+
+/* ---------- AUM distribution (stacked by reg type) ---------- */
+(function aum() {
+  const svg = document.getElementById('aum');
+  const bands = [['<$10M',0,10e6],['$10–25M',10e6,25e6],['$25–125M',25e6,125e6],
+                 ['$125–200M',125e6,200e6],['$200M–1B',200e6,1e9],['>$1B',1e9,Infinity],['not filed',null,null]];
+  const types = ['STATE','SEC','ERA'];
+  const rows = bands.map(([label, lo, hi]) => {
+    const inBand = FIRMS.filter(f => lo === null ? f.a == null : (f.a != null && f.a >= lo && f.a < hi));
+    return { label, by: types.map(t => inBand.filter(f => f.t === t).length), total: inBand.length };
+  });
+  const maxT = Math.max(...rows.map(r => r.total));
+  const L = 78, T = 6, rowH = 24, gapY = 10, barH = 14, W = 340, plotW = W - L - 34;
+  let el = '';
+  rows.forEach((r, ri) => {
+    const y = T + ri * (rowH + gapY);
+    el += `<text x="${L - 8}" y="${y + barH - 2}" text-anchor="end" fill="var(--ink-2)">${r.label}</text>`;
+    let x = L;
+    r.by.forEach((n, ti) => {
+      if (!n) return;
+      const w = Math.max(0, n / maxT * plotW - 2);
+      el += `<rect data-lab="${r.label}" data-t="${types[ti]}" data-n="${n}" x="${x}" y="${y}" width="${w}" height="${barH}" rx="3"
+        fill="var(--s-${types[ti].toLowerCase()})"/>`;
+      x += n / maxT * plotW;
+    });
+    el += `<text x="${x + 5}" y="${y + barH - 2}" fill="var(--muted)">${r.total}</text>`;
+  });
+  el += `<line x1="${L}" y1="${T - 4}" x2="${L}" y2="${T + rows.length*(rowH+gapY) - gapY + 4}" stroke="var(--axis)" stroke-width="1"/>`;
+  svg.setAttribute('viewBox', `0 0 ${W} ${T + rows.length*(rowH+gapY) + 4}`);
+  svg.innerHTML = el;
+  svg.addEventListener('mousemove', e => {
+    const t = e.target.closest('rect[data-n]');
+    t ? showTip(e, `<div class="t">${t.dataset.n} ${t.dataset.t === 'STATE' ? 'state-registered' : t.dataset.t === 'SEC' ? 'SEC-registered' : 'exempt-reporting'}</div><div class="m">${t.dataset.lab} band</div>`) : hideTip();
+  });
+  svg.addEventListener('mouseleave', hideTip);
+})();
+
+/* ---------- ranked table ---------- */
+(function table() {
+  const tb = document.querySelector('#tbl tbody');
+  const pill = (v) => {
+    const strong = v >= 4;
+    return `<span class="pill" style="background:${strong ? 'var(--seq-500)' : 'var(--grid)'};color:${strong ? '#fff' : 'var(--ink-2)'}">${v}</span>`;
+  };
+  tb.innerHTML = FIRMS.map((f, i) => `<tr>
+    <td class="num" style="color:var(--muted)">${i + 1}</td>
+    <td><span class="dot" style="background:var(--s-${f.t.toLowerCase()})"></span><span class="firm">${f.n}</span></td>
+    <td>${f.c}</td>
+    <td class="num">${f.d ?? '—'}</td>
+    <td class="num">${fmtAUM(f.a)}</td>
+    <td class="num">${f.e ?? '—'} / ${f.i ?? '—'}</td>
+    <td class="num">${pill(f.f)}</td>
+    <td class="num">${pill(f.r)}</td>
+    <td class="num">${f.y || '—'}</td>
+    <td class="band">${f.b || ''}</td>
+  </tr>`).join('');
+})();
+</script>
