@@ -101,3 +101,25 @@ D-003) — which also keeps the token off this machine entirely; (3) the base sc
 views/automations are manual (no public API) per docs/PHASE2_AIRTABLE.md. The 13 stage names are
 provisional placeholders for Mark to rename in place. Writer hardened for user-run testing:
 surfaces Airtable 422 error bodies and spaces batches 0.25s under the 5 req/s limit.
+
+## D-016 · 2026-09-09 · Permanent opt-out enforcement (dual-source, fails closed)
+README promised that an opted-out prospect is *never* re-imported, but no code implemented it:
+the Airtable schema had `Do Not Contact` / `Opt-Out Date` / `Outcome`, and `crm_writer` was
+write-only (`performUpsert` on CRD, no GET), so a checked box had no effect on the next run — and
+the CSV export, which is what any outreach batch actually works from, still contained the firm.
+**Decision:** new `src/compliance.py`, invoked from the pipeline *before* any outreach surface is
+written. Effective exclusion set = **union** of (a) `Do Not Contact` OR `Opt-Out Date` OR
+`Outcome = "Do Not Contact"` in Airtable, and (b) `compliance/exclusions.csv`, an append-only file
+committed to git. Three Airtable signals rather than one because staff reach for whichever field is
+in front of them; failing open because someone used the "wrong" field is not acceptable.
+Rationale for the local file: the exclusion must survive Airtable itself (a lapsed subscription
+nearly happened in Sept 2026), must be enforceable with no token and no network, and must leave a
+git-visible audit trail for the Fed / NE Dept. of Banking. An Airtable-only design would silently
+stop enforcing exactly when the fetch fails. **Fails closed:** an unreachable Airtable does not
+mean "nobody opted out" — the local file still applies and the run prints a loud warning that a
+newer Airtable opt-out was not visible to it. Excluded firms are **retained** in the JSON research
+snapshot with `excluded=true` rather than dropped, so diffs don't report them as false
+terminations (cf. D-014) and an auditor can prove the exclusion was applied rather than inferring
+it from an absence; they are withheld from the CSV export and the Airtable upsert. Reinstating a
+firm is a deliberate manual edit of the CSV, visible in git history — nothing in code ever removes
+an exclusion.

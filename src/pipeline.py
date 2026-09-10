@@ -23,6 +23,7 @@ from parse_feeds import parse_all
 from geo import load_geocodes, attach_distance
 from score import score_all
 from crm_writer import CSVCRMWriter, AirtableCRMWriter
+from compliance import effective_exclusions, apply_exclusions
 from diff import diff_snapshots
 
 SNAPSHOT_RE = re.compile(r"^firms_(\d{4}-\d{2}-\d{2})\.json$")
@@ -94,6 +95,31 @@ def _print_diff_summary(diff):
     ))
 
 
+def _print_exclusion_summary(report, withheld):
+    """Report opt-out enforcement. Loud when Airtable could not be consulted."""
+    status = report["airtable_status"]
+    if status == "ok":
+        print("Opt-out check: %d in Airtable, %d in local audit file, %d effective."
+              % (report["airtable"], report["local"], report["effective"]))
+    else:
+        # Fail closed and say so: the local file still applies, but a newly
+        # checked box in Airtable would not be visible to this run.
+        print("Opt-out check: Airtable NOT consulted (%s). Enforcing the %d "
+              "exclusion(s) in the local audit file only -- a newer opt-out "
+              "recorded in Airtable would NOT be caught by this run."
+              % (status, report["local"]))
+
+    if report["newly_recorded"]:
+        print("  Newly recorded in compliance/exclusions.csv: %s"
+              % ", ".join(report["newly_recorded"]))
+
+    if withheld:
+        print("  Withheld from CSV + Airtable (%d): %s"
+              % (len(withheld),
+                 ", ".join("%s (%s)" % (r.get("crd"), r.get("business_name"))
+                           for r in withheld)))
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="NBC_Trust succession pipeline")
     parser.add_argument("--as-of", default=AS_OF, help="As-of date (YYYY-MM-DD)")
@@ -126,13 +152,26 @@ def main(argv=None):
         json.dump(records, fh, indent=2, sort_keys=True, ensure_ascii=True)
         fh.write("\n")
 
+    # Permanent opt-out enforcement (README "Opt-out requests"; D-016).
+    # Runs BEFORE any outreach surface is written. Excluded firms stay in the
+    # JSON snapshot flagged excluded=True so diffs stay honest, but they are
+    # withheld from the CSV and from Airtable.
+    excluded_crds, excl_report = effective_exclusions(as_of)
+    releasable, withheld = apply_exclusions(records, excluded_crds)
+    _print_exclusion_summary(excl_report, withheld)
+
+    # Rewrite the snapshot now that every record carries its excluded flag.
+    with open(snapshot_path, "w", encoding="utf-8") as fh:
+        json.dump(records, fh, indent=2, sort_keys=True, ensure_ascii=True)
+        fh.write("\n")
+
     csv_path = DATA_PROCESSED / ("crm_export_%s.csv" % as_of)
     csv_writer = CSVCRMWriter(csv_path)
-    csv_result = csv_writer.upsert_firms(records, as_of)
+    csv_result = csv_writer.upsert_firms(releasable, as_of)
     print("CSV export: %s" % csv_result)
 
     airtable_writer = AirtableCRMWriter()
-    airtable_result = airtable_writer.upsert_firms(records, as_of)
+    airtable_result = airtable_writer.upsert_firms(releasable, as_of)
     print("Airtable export: %s" % airtable_result)
 
     prev_snapshot_path = _find_previous_snapshot(as_of)

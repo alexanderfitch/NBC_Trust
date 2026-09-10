@@ -17,8 +17,9 @@ Both are U.S. government public domain data published through the SEC's Investme
 
 - **`data/raw/`** — Immutable snapshots of downloaded feeds (XML) and geocoding results (CSV), keyed by ISO date. Never delete or modify files here.
 - **`data/processed/`** — Pipeline output: JSON snapshots of scored/deduplicated firms, CSV exports, and diffs showing month-over-month changes.
-- **`src/`** — Pipeline modules: `pipeline.py` (orchestrator), `parse_feeds.py`, `geo.py`, `score.py`, `crm_writer.py`, `diff.py`, `config.py`.
+- **`src/`** — Pipeline modules: `pipeline.py` (orchestrator), `parse_feeds.py`, `geo.py`, `score.py`, `crm_writer.py`, `compliance.py` (opt-out enforcement), `diff.py`, `config.py`.
 - **`tests/`** — Unit tests for pipeline modules.
+- **`compliance/`** — `exclusions.csv`, the append-only permanent opt-out register. Append only; never delete a row (see "Opt-out requests" below and DECISIONS.md D-016).
 - **`scripts/`** — Utility scripts, including `download_feeds.py` (monthly data refresh).
 - **`docs/`** — This README, `DATA_QUALITY_REPORT.md`, `PLAN.md`, and `DECISIONS.md`.
 
@@ -78,7 +79,7 @@ Prospect data is sensitive and must be handled carefully:
 
 - **Airtable base access:** Keep the base restricted to authorized NBC Trust staff only. Use Airtable's sharing and API-token scoping to enforce least-privilege access.
 - **No secrets in the repository:** Never commit Airtable API keys, FINRA credentials, or personal information to version control.
-- **Opt-out requests:** If a prospect requests removal from the research list, record the request in the CRM's Compliance log. **Never re-import that prospect in any future pipeline run** — the CRM logic maintains a permanent exclusion.
+- **Opt-out requests:** If a prospect requests removal from the research list, tick **Do Not Contact** on their Firms record in Airtable (or set `Opt-Out Date`, or `Outcome = Do Not Contact` — any one of the three is honoured) and log the request in the Compliance Log table. **That prospect is never re-imported by a future run.** Enforcement is in `src/compliance.py` and runs before any outreach surface is written: the firm is withheld from the CSV export and from the Airtable upsert, and its CRD is appended to `compliance/exclusions.csv` — an append-only file committed to git, so the exclusion survives Airtable itself and is still enforced when the pipeline runs with no token or no network. Excluded firms remain in the JSON research snapshot flagged `excluded: true` so month-over-month diffs stay honest and the exclusion is provable to an examiner. Nothing in the code ever removes an exclusion; reinstating a firm is a deliberate edit of that CSV, visible in git history. See DECISIONS.md D-016.
 - **Consent:** All outreach materials generated from this data are subject to federal compliance review before publication.
 
 ## Known limitations

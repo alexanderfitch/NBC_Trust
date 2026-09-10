@@ -9,7 +9,8 @@ DECISIONS.md D-003). Your API token stays on your machine; nothing here requires
    Note the workspace id (`wspXXXXXXXXXXXXXX`) from the workspace URL.
 2. **Create a personal access token** at <https://airtable.com/create/tokens> with scopes
    `schema.bases:write`, `data.records:read`, `data.records:write`, and grant it access to that
-   workspace.
+   workspace. (`data.records:read` is not optional — opt-out enforcement reads the Firms table on
+   every run; see §6.)
 3. **Create the base** (one command, run ONCE — it is not idempotent):
 
    ```bash
@@ -70,7 +71,37 @@ The 13 stages in the Stage select are placeholders in NBC's honorable-exit langu
 rename them in place (renaming options in Airtable preserves existing records; do not delete and
 re-add). If he supplies a different 13, edit the choice names only.
 
-## 6. What the pipeline owns vs what the client owns
+## 6. Opt-out enforcement (verify this works before any outreach)
+
+The permanent exclusion promised in README is enforced by `src/compliance.py` (DECISIONS.md
+D-016). It reads Airtable at the start of every run, so the token needs
+**`data.records:read`** in addition to the write scopes — without it the run still works but
+prints a loud warning that Airtable was not consulted.
+
+Test it once, end to end:
+
+```bash
+# 1. In Airtable, tick "Do Not Contact" on any one Firms record. Note its CRD.
+# 2. Re-run the pipeline.
+python3 src/pipeline.py --as-of 2026-07-14
+```
+
+Pass criteria:
+- [ ] Run prints `Withheld from CSV + Airtable (1): <CRD> (<FIRM>)`.
+- [ ] That CRD is **absent** from `data/processed/crm_export_*.csv` — this is the file outreach
+      batches work from, so this is the one that matters.
+- [ ] The CRD now appears in `compliance/exclusions.csv` with the date it was first seen.
+- [ ] The firm is **still present** in `data/processed/firms_*.json` with `"excluded": true` —
+      retained on purpose, so diffs don't report a false termination and so the exclusion is
+      provable to an examiner.
+- [ ] Un-tick the box in Airtable and re-run: the firm stays excluded, because the local file is
+      append-only. That is intended. Reinstating is a deliberate edit of `compliance/exclusions.csv`,
+      visible in git history.
+
+The exclusion survives a lapsed Airtable subscription, a deleted base, and a run with no network
+or no token — the local file is enforced regardless. Never delete rows from it.
+
+## 7. What the pipeline owns vs what the client owns
 
 | Pipeline-owned (overwritten monthly) | Client-owned (never touched) |
 |---|---|
