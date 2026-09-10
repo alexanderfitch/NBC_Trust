@@ -212,3 +212,29 @@ preview build only; never published" banner injected after `<body>`, and the nav
 a red outlined pill, deliberately unlike every real nav item, so neither the link nor the page can
 be mistaken for public. A missing tool source is skipped with a notice rather than failing the
 build, so a moved dashboard never blocks a preview.
+
+## D-021 · 2026-09-10 · Dashboard basemap: baked-in vector, not a tile service
+The prospect map showed dots and distance rings on a blank field — no geographic context.
+**Rejected:** a tile basemap (Leaflet/Mapbox/OSM). It would add a runtime network dependency and a
+CDN to an internal tool that must open from the filesystem, and every pan/zoom would tell a
+third-party tile server which patch of Nebraska this firm is studying. Not a data leak in the
+strict sense (tile requests carry z/x/y, not prospect records), but it is a needless external
+observer on confidential research, on a page that must keep working offline.
+**Decision:** bake the basemap in as SVG path data. State outlines for NE/IA/KS/MO/SD, projected
+into the same Lincoln-centred equirectangular space `map()` already uses (2.887 px/mile), drawn
+beneath the rings and dots, clipped to the frame, `pointer-events:none` so dot tooltips are
+unaffected. Source: **US Census Bureau TIGERweb State_County service at full resolution, US
+federal government public domain** — same provenance discipline as the ADV feeds (D-001).
+Generator committed as `docs/dashboard/make_basemap.py` (`--write` patches the dashboard,
+`--input` uses a local cache) so this is reproducible rather than a one-off paste, and so it can
+be re-run if the projection constants change.
+**Sizing:** the raw source is ~14–24k points per state. Detail is kept only where it can be seen:
+~0.9 mile (2.5px) inside the frame plus a 60px margin, thinned to 45px outside — the ring still
+has to close for the land fill, but nobody can see its shape out there. 0.5-mile detail was
+tried first and cost 30 KB against 20 KB with no visible difference. Dashboard: 40 KB → 61 KB.
+First attempt used a 1:20m boundary file, which left only ~12 visible points for Nebraska and
+rendered the Missouri River as three straight segments — worse than no basemap, since it
+misrepresented the border. Hence full-resolution source plus local simplification.
+Also: `--land` / `--land-line` / `--land-label` tokens added to all four theme blocks so the
+basemap follows light/dark; the `KS` label was moved to (381,532) because at (200,472) it collided
+with the "90 mi" ring label, which sits on the down-left diagonal with the other two.
