@@ -16,7 +16,7 @@ DECISIONS.md D-003). Your API token stays on your machine; nothing here requires
    ```bash
    cd /Users/Alexfitch/NBC_Trust
    export AIRTABLE_API_KEY=pat________________
-   python3 scripts/setup_airtable.py --workspace-id wspXXXXXXXXXXXXXX
+   python3 data-engine/scripts/setup_airtable.py --workspace-id wspXXXXXXXXXXXXXX
    ```
 
    This creates the "NBC Trust Succession CRM" base with three tables — **Firms** (pipeline
@@ -29,8 +29,8 @@ DECISIONS.md D-003). Your API token stays on your machine; nothing here requires
 export AIRTABLE_BASE_ID=appXXXXXXXXXXXXXX     # printed by setup script
 export AIRTABLE_TABLE=Firms
 export AIRTABLE_IN_RADIUS_ONLY=1              # free tier: load 111 firms, not 867
-python3 src/pipeline.py --as-of 2026-07-14
-python3 src/pipeline.py --as-of 2026-07-14    # run twice on purpose
+python3 data-engine/src/pipeline.py --as-of 2026-07-14
+python3 data-engine/src/pipeline.py --as-of 2026-07-14    # run twice on purpose
 ```
 
 Pass criteria (check in the Airtable UI):
@@ -73,7 +73,7 @@ re-add). If he supplies a different 13, edit the choice names only.
 
 ## 6. Opt-out enforcement (verify this works before any outreach)
 
-The permanent exclusion promised in README is enforced by `src/compliance.py` (DECISIONS.md
+The permanent exclusion promised in README is enforced by `data-engine/src/compliance.py` (DECISIONS.md
 D-016). It reads Airtable at the start of every run, so the token needs
 **`data.records:read`** in addition to the write scopes — without it the run still works but
 prints a loud warning that Airtable was not consulted.
@@ -83,15 +83,15 @@ Test it once, end to end:
 ```bash
 # 1. In Airtable, tick "Do Not Contact" on any one Firms record. Note its CRD.
 # 2. Re-run the pipeline.
-python3 src/pipeline.py --as-of 2026-07-14
+python3 data-engine/src/pipeline.py --as-of 2026-07-14
 ```
 
 Pass criteria:
 - [ ] Run prints `Withheld from CSV + Airtable (1): <CRD> (<FIRM>)`.
-- [ ] That CRD is **absent** from `data/processed/crm_export_*.csv` — this is the file outreach
+- [ ] That CRD is **absent** from `data-engine/data/processed/crm_export_*.csv` — this is the file outreach
       batches work from, so this is the one that matters.
 - [ ] The CRD now appears in `compliance/exclusions.csv` with the date it was first seen.
-- [ ] The firm is **still present** in `data/processed/firms_*.json` with `"excluded": true` —
+- [ ] The firm is **still present** in `data-engine/data/processed/firms_*.json` with `"excluded": true` —
       retained on purpose, so diffs don't report a false termination and so the exclusion is
       provable to an examiner.
 - [ ] Un-tick the box in Airtable and re-run: the firm stays excluded, because the local file is

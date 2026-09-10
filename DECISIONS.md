@@ -145,3 +145,24 @@ feed carries exam dates that proxy age, which D-012 excluded on purpose — revi
 choosing between parse-time field-dropping with attorney review, channel-only reach, or firm-level
 proxies; see PLAN.md §8). Also parked: v1's Phase 5 "AI prospect briefs", absent from the client's
 plan. v1 plan preserved in git history at 708d146; PLAN.md is now v2.
+
+## D-018 · 2026-09-09 · Monorepo restructure into legible top-level parts
+Per D-017(4) the project stays one repo. Restructured (`git mv`, so history follows the files):
+`src/ tests/ scripts/ data/` → **`data-engine/`**; new **`microsite/`** (`src/ content/ assets/`),
+**`research/`**; **`compliance/`** and **`docs/`** stay at the monorepo root. Each directory has
+its own README.
+**Why compliance/ stays at the root:** it is not the pipeline's private state. The microsite will
+write consent records and download requests to the same append-only register the pipeline reads
+for suppression. One register, one truth, at the root where both workstreams can see it.
+**The one code change required:** `config.py` previously had a single `REPO_ROOT =
+parent.parent`, which after the move would have silently resolved to `data-engine/` and pointed
+`compliance/` at the wrong place. Now split: `ENGINE_ROOT` (data-engine/) for pipeline data,
+`REPO_ROOT` (monorepo root) for shared artifacts. Every other relative path — `tests`'
+`parent.parent / "src"`, `download_feeds.py`'s `parent.parent / "data"` — was already relative to
+the moved unit and needed no change.
+Also updated: Makefile, `.github/workflows/monthly.yml` (which now also commits
+`compliance/exclusions.csv`, since a monthly run can newly record an opt-out), `.gitignore`,
+README layout, docs/PHASE2_AIRTABLE.md command paths. Verified: 53/53 tests pass, `make run`
+writes to `data-engine/data/processed/`, `EXCLUSIONS_PATH` resolves to the monorepo root.
+**Not rewritten:** path references inside DATA_QUALITY_REPORT.md and earlier DECISIONS entries.
+Those are dated audit records and were accurate when written; this entry is the forward pointer.

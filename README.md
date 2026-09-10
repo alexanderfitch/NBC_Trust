@@ -15,36 +15,41 @@ Both are U.S. government public domain data published through the SEC's Investme
 
 ## Repository layout
 
-- **`data/raw/`** — Immutable snapshots of downloaded feeds (XML) and geocoding results (CSV), keyed by ISO date. Never delete or modify files here.
-- **`data/processed/`** — Pipeline output: JSON snapshots of scored/deduplicated firms, CSV exports, and diffs showing month-over-month changes.
-- **`src/`** — Pipeline modules: `pipeline.py` (orchestrator), `parse_feeds.py`, `geo.py`, `score.py`, `crm_writer.py`, `compliance.py` (opt-out enforcement), `diff.py`, `config.py`.
-- **`tests/`** — Unit tests for pipeline modules.
-- **`compliance/`** — `exclusions.csv`, the append-only permanent opt-out register. Append only; never delete a row (see "Opt-out requests" below and DECISIONS.md D-016).
-- **`scripts/`** — Utility scripts, including `download_feeds.py` (monthly data refresh).
-- **`docs/`** — This README, `DATA_QUALITY_REPORT.md`, `PLAN.md`, and `DECISIONS.md`.
+A monorepo, split so each part reads on its own. Each directory has its own README.
+
+| Directory | What it is |
+|---|---|
+| **`data-engine/`** | The prospect data pipeline — `src/`, `tests/`, `scripts/`, and `data/` (immutable `raw/` snapshots, generated `processed/` output). |
+| **`microsite/`** | The public SEO-driven succession microsite — `src/`, versioned `content/`, `assets/`. |
+| **`compliance/`** | `exclusions.csv`, the append-only permanent opt-out register, plus consent exports and audit bundles. Shared across workstreams; append only, never delete a row. |
+| **`research/`** | Keyword, category-descriptor, SERP, placement and thought-leadership research — the inputs handed to the comms workstream. |
+| **`docs/`** | Reports, runbooks, and the internal prospect dashboard. |
+
+Planning and audit documents live at the root: `PLAN.md` (current build plan),
+`DECISIONS.md` (append-only decision log), `DATA_QUALITY_REPORT.md` (the Phase 1 validation gate).
 
 ## How to run
 
 ### Quick test
 ```bash
 make test
-python3 src/pipeline.py
+python3 data-engine/src/pipeline.py
 ```
 
 The pipeline defaults to the `AS_OF` date in `src/config.py`. To process a different date:
 ```bash
-python3 src/pipeline.py --as-of 2026-07-21 --radius 90
+python3 data-engine/src/pipeline.py --as-of 2026-07-21 --radius 90
 ```
 
 The `--radius` flag is optional (default 90 miles); all firms in the processed output include an `in_radius` flag so you can re-filter without re-running.
 
 ### Monthly refresh
 ```bash
-python3 scripts/download_feeds.py --date 07-14-2026
-python3 src/pipeline.py --as-of 2026-07-14
+python3 data-engine/scripts/download_feeds.py --date 07-14-2026
+python3 data-engine/src/pipeline.py --as-of 2026-07-14
 ```
 
-By default, `download_feeds.py` uses today's date; pass `--date MM_DD_YYYY` to fetch a specific date. The script skips download if the files already exist (immutability); delete `data/raw/firms_*.xml` if you need to re-fetch.
+By default, `download_feeds.py` uses today's date; pass `--date MM_DD_YYYY` to fetch a specific date. The script skips download if the files already exist (immutability); delete `data-engine/data/raw/firms_*.xml` if you need to re-fetch.
 
 ## Airtable setup
 
@@ -58,10 +63,10 @@ To load prospects directly into Airtable, set these environment variables before
 export AIRTABLE_API_KEY="pat_..."
 export AIRTABLE_BASE_ID="app_..."
 export AIRTABLE_TABLE="Firms"
-python3 src/pipeline.py
+python3 data-engine/src/pipeline.py
 ```
 
-If any of these are missing, the pipeline will skip Airtable upload and print a notice. **A CSV export is always written to `data/processed/` regardless of Airtable credentials.**
+If any of these are missing, the pipeline will skip Airtable upload and print a notice. **A CSV export is always written to `data-engine/data/processed/` regardless of Airtable credentials.**
 
 ## Monthly refresh via GitHub Actions
 
@@ -79,7 +84,7 @@ Prospect data is sensitive and must be handled carefully:
 
 - **Airtable base access:** Keep the base restricted to authorized NBC Trust staff only. Use Airtable's sharing and API-token scoping to enforce least-privilege access.
 - **No secrets in the repository:** Never commit Airtable API keys, FINRA credentials, or personal information to version control.
-- **Opt-out requests:** If a prospect requests removal from the research list, tick **Do Not Contact** on their Firms record in Airtable (or set `Opt-Out Date`, or `Outcome = Do Not Contact` — any one of the three is honoured) and log the request in the Compliance Log table. **That prospect is never re-imported by a future run.** Enforcement is in `src/compliance.py` and runs before any outreach surface is written: the firm is withheld from the CSV export and from the Airtable upsert, and its CRD is appended to `compliance/exclusions.csv` — an append-only file committed to git, so the exclusion survives Airtable itself and is still enforced when the pipeline runs with no token or no network. Excluded firms remain in the JSON research snapshot flagged `excluded: true` so month-over-month diffs stay honest and the exclusion is provable to an examiner. Nothing in the code ever removes an exclusion; reinstating a firm is a deliberate edit of that CSV, visible in git history. See DECISIONS.md D-016.
+- **Opt-out requests:** If a prospect requests removal from the research list, tick **Do Not Contact** on their Firms record in Airtable (or set `Opt-Out Date`, or `Outcome = Do Not Contact` — any one of the three is honoured) and log the request in the Compliance Log table. **That prospect is never re-imported by a future run.** Enforcement is in `data-engine/src/compliance.py` and runs before any outreach surface is written: the firm is withheld from the CSV export and from the Airtable upsert, and its CRD is appended to `compliance/exclusions.csv` — an append-only file committed to git, so the exclusion survives Airtable itself and is still enforced when the pipeline runs with no token or no network. Excluded firms remain in the JSON research snapshot flagged `excluded: true` so month-over-month diffs stay honest and the exclusion is provable to an examiner. Nothing in the code ever removes an exclusion; reinstating a firm is a deliberate edit of that CSV, visible in git history. See DECISIONS.md D-016.
 - **Consent:** All outreach materials generated from this data are subject to federal compliance review before publication.
 
 ## Known limitations

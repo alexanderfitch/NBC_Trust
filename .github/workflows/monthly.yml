@@ -20,10 +20,10 @@ jobs:
           python-version: "3.11"
 
       - name: Download IAPD feeds
-        run: python3 scripts/download_feeds.py
+        run: python3 data-engine/scripts/download_feeds.py
 
       - name: Run pipeline
-        run: python3 src/pipeline.py
+        run: python3 data-engine/src/pipeline.py
         env:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
           AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
@@ -33,7 +33,7 @@ jobs:
         run: |
           git config user.name "nbctrust-bot"
           git config user.email "noreply@nbctrust.example"
-          git add data/raw data/processed
+          git add data-engine/data/raw data-engine/data/processed compliance/exclusions.csv
           if ! git diff --quiet --cached; then
             git commit -m "Monthly IAPD refresh: $(date -u +%Y-%m-%d)"
             git push
