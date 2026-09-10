@@ -123,3 +123,25 @@ terminations (cf. D-014) and an auditor can prove the exclusion was applied rath
 it from an absence; they are withheld from the CSV export and the Airtable upsert. Reinstating a
 firm is a deliberate manual edit of the CSV, visible in git history — nothing in code ever removes
 an exclusion.
+
+## D-017 · 2026-09-09 · Strategic pivot: invitation-only → public inbound funnel
+Client's actual Phase 1 plan (Sam's "NBC TRUST SUCCESSION PLANNING PHASE I" doc, received today)
+has evolved away from v1's premise. **Changes of record:**
+(1) **Funnel inverted.** v1 Phase 3 was an *invitation-only* "raise your hand" page. It is now a
+**public microsite** on the NBC Trust domain, featured from the homepage, fed by video
+storytelling, a story-form case study, a downloadable checklist, thought leadership, digital
+placements and email. Consequence: compliance-attorney review of public copy moves onto the
+critical path, and public-asset versioning (v1 Phase 4) is no longer deferrable.
+(2) **Two personas named.** "Dan" = senior advisor approaching succession (Phase 1, active).
+"Morgan" = next-generation advisor (deferred by client decision until the Dan funnel is live).
+Both are also real NBC Trust staff and the case study's subjects.
+(3) **Scope of this workstream expanded** from "the data engine" to data + microsite build +
+digital messaging strategy and placements + SEO/keyword research + thought-leadership opportunity
+finding. Microsite build is mine; the homepage traffic feature stays with NBC's existing web dev.
+(4) **Repo stays a monorepo** at the user's direction, restructured into legible top-level parts
+(`data-engine/`, `microsite/`, `compliance/`, `research/`, `docs/`) rather than split across repos.
+Deferred by decision: Morgan targeting (needs individual-level data; the free rep-level `IA_INDVL`
+feed carries exam dates that proxy age, which D-012 excluded on purpose — revisiting it means
+choosing between parse-time field-dropping with attorney review, channel-only reach, or firm-level
+proxies; see PLAN.md §8). Also parked: v1's Phase 5 "AI prospect briefs", absent from the client's
+plan. v1 plan preserved in git history at 708d146; PLAN.md is now v2.
