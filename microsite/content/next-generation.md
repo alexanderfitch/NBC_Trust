@@ -1,29 +1,22 @@
 ---
 title: For next-generation advisers
-description: PLACEHOLDER — The same handover, seen from the other side, for advisers early in building their own practice.
-nav_label: For next-generation advisers
+description: The same handover, seen from the other side — for advisers building a practice who want to take one on.
+nav_label: Next generation
+eyebrow: The other side of the handover
 schema_type: WebPage
+status: draft
 ---
 
-# The same story, from the other side
+# Someone has to be on the other end of this
 
-PLACEHOLDER — this page exists to answer Sam's open question in his doc: do "Morgans"
-follow the same breadcrumbs and land on the same page, or do they need their own view of
-the same subject matter?
+Every succession story needs two people. The adviser stepping back gets most of the attention. The one taking over is the reason it works.
 
-**Deliberately minimal for now.** PLAN.md §8 defers building *for* next-generation advisers
-until the primary funnel is live. This page keeps the door open at almost no cost — a
-Morgan who arrives via the case study finds something addressed to them rather than
-nothing — without committing to a second funnel we have not planned or resourced.
-
-Note that nothing here requires individual-level advisor data. Reaching this audience is a
-channel question (PLAN.md B6), not a dataset question, which is what keeps the system free
-of anything that could proxy age.
-
-## What a handover looks like from where you are standing
-
-PLACEHOLDER — Sam, if this page survives, this is where Morgan's perspective goes.
+If you are building a practice and would consider taking on someone else's, that is a conversation worth having — earlier than you would think, because the good handovers take years, not months.
 
 [video:morgans-view]
+
+## What it actually asks of you
+
+Not capital, in the first instance. Patience, and a genuine willingness to inherit relationships on their terms rather than yours.
 
 [cta:contact]

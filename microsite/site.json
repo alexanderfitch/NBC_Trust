@@ -2,6 +2,8 @@
   "organization": "NBC Trust",
   "base_url": "https://www.nbctrust.com",
   "path_prefix": "/succession",
+  "show_draft_notice": true,
+  "_show_draft_notice_note": "Renders a discreet 'Draft' ribbon on any page whose front matter says status: draft. Set false to hide it for a clean screen-share, but the copy is still a working draft until Sam's messaging strategy lands -- the flag changes the ribbon, not the facts. Set each page's status to 'final' as real copy arrives.",
   "_path_prefix_note": "Where the microsite is mounted. PLAN.md decision #6: main domain at /succession vs a subdomain. If it becomes a subdomain root, set this to \"\". Build with --local to preview at a server root.",
   "_base_url_note": "PLACEHOLDER - confirm the real domain and whether the microsite lives at /succession or on a subdomain (PLAN.md decision #6).",
   "pages": [

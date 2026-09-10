@@ -6,8 +6,10 @@
 <title>{{title}} — {{organization}}</title>
 <meta name="description" content="{{description}}">
 <link rel="canonical" href="{{canonical}}">
+<meta name="theme-color" content="#003d68">
 
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="{{organization}}">
 <meta property="og:title" content="{{title}}">
 <meta property="og:description" content="{{description}}">
 <meta property="og:url" content="{{canonical}}">
@@ -20,15 +22,27 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+{{draft_notice}}
 
 <header class="masthead">
   <div class="wrap masthead__inner">
-    <a class="wordmark" href="{{home}}">{{organization}}</a>
+    <a class="wordmark" href="{{home}}">
+      <span class="wordmark__mark">NBC</span>
+      <span class="wordmark__rest">Trust Company</span>
+    </a>
     <nav class="nav" aria-label="Succession">
       {{nav}}
     </nav>
   </div>
 </header>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="hero__eyebrow">{{eyebrow}}</p>
+    <h1>{{heading}}</h1>
+    {{lede}}
+  </header>
+</div>
 
 <main id="main" class="wrap prose">
 {{body}}
@@ -36,10 +50,32 @@
 
 <footer class="footer">
   <div class="wrap">
-    <p>&copy; {{year}} {{organization}}. Built {{build_date}}.</p>
+    <div class="footer__grid">
+      <div>
+        <p class="footer__wordmark">NBC Trust</p>
+        <p>A Nebraska trust company, helping independent advisers hand over the practices they built.</p>
+      </div>
+      <div>
+        <h2>Succession</h2>
+        <ul>{{footer_nav}}</ul>
+      </div>
+      <div>
+        <h2>NBC Trust Company</h2>
+        <ul>
+          <li><a href="https://nbctrustco.com/">Main site</a></li>
+          <li><a href="https://nbctrustco.com/about-us-the-team/">About &amp; the team</a></li>
+          <li><a href="https://nbctrustco.com/contact-us/">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__meta">
+      <span>&copy; {{year}} {{organization}}</span>
+      <span>Lincoln, Nebraska</span>
+    </div>
     <p class="footer__note">
-      PLACEHOLDER — required footer disclosures, privacy policy link and regulatory
-      language pending compliance-attorney review (PLAN.md Stage D6).
+      Required disclosures, privacy policy and regulatory language are pending
+      compliance-attorney review and are not yet present on this page. Nothing here is an offer,
+      a solicitation, or a guarantee of any outcome.
     </p>
   </div>
 </footer>

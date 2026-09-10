@@ -1,32 +1,29 @@
 ---
 title: The succession checklist
-description: PLACEHOLDER — A practical checklist for independent advisers beginning to think about succession.
+description: A practical checklist for independent advisers starting to think about succession — the questions worth answering before you talk to anyone.
 nav_label: The checklist
+eyebrow: Free, no obligation
 schema_type: WebPage
+status: draft
 ---
 
-# Before you talk to anyone
+# The questions worth answering before you talk to anyone
 
-PLACEHOLDER — the checklist landing and download page. Sam's plan has the checklist as the
-main downloadable asset and the primary lead capture; the content backbone comes from NBC
-Trust leadership, with Dan and Morgan as the best sources.
+Most advisers put off thinking about succession because the first step is unclear, not because the subject is unwelcome. This is the first step.
 
-This is the page the download form lives on. The form itself is Stage C4 — not yet built,
-because it needs a decision on where it posts (see PLAN.md and the blockers list).
+It is a short document. Nothing in it commits you to anything, and you do not need to speak to us to use it.
 
 ## What is in it
 
-PLACEHOLDER — a genuine preview of the checklist's sections. Give away enough that the
-download feels worth it and the page can rank for what people actually search.
-
-- PLACEHOLDER — section one
-- PLACEHOLDER — section two
-- PLACEHOLDER — section three
+- **What you actually want** — the questions to answer for yourself before anyone else is involved
+- **What your clients need** — how to think about continuity from their side of the table
+- **What to get in order** — the practical items that take longer than expected
+- **What to ask anyone offering to help** — including us
 
 ## Get the checklist
 
-PLACEHOLDER — form goes here (Stage C4). Consent language must be reviewed by the
-compliance attorney before this page is public, and the submission has to write a
-timestamped consent record to `compliance/` (PLAN.md Stage F2).
+The download form is not built yet. When it is, it will ask for a name and an email address, tell you exactly what we will and will not do with them, and log your consent with a timestamp.
+
+If you would rather skip the form entirely, just ask someone for a copy.
 
 [cta:contact]

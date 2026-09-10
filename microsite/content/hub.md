@@ -1,53 +1,60 @@
 ---
-title: An honorable exit
-description: PLACEHOLDER — NBC Trust helps independent advisers hand over the practice they built, on their own terms, to people who will look after their clients.
+title: Succession, done well
+description: NBC Trust helps independent advisers in Nebraska hand over the practice they built — to people who will look after their clients the way they did.
 nav_label: Overview
+eyebrow: For independent advisers
 schema_type: WebPage
+status: draft
 ---
 
-# The practice you built deserves a good ending
+# Your practice deserves the same plan you gave your clients
 
-PLACEHOLDER — Sam owns this copy. What follows is structural: it shows the page's shape,
-the order of the argument, and where the videos and calls to action sit, so the build could
-proceed before copy existed. Replace the words; keep or challenge the structure.
+You have spent a career telling people to begin with the end in mind. Most advisers never get around to doing it for themselves.
 
-You spent a career earning the trust of the people who rely on you. Deciding what happens
-to that trust when you are ready to step back is one of the hardest questions in this
-business — and one most advisers face without much help.
+We did it here, in our own firm. This is what it looked like.
 
 [video:why-we-do-this]
 
-## We have been through this ourselves
+## We are not trying to buy your practice
 
-PLACEHOLDER — the core credibility move from Sam's plan: NBC Trust is not describing a
-service in the abstract. Dan and Morgan's handover actually happened here, and the case
-study and videos are their account of it.
+That is worth saying plainly, because it is the first thing most advisers assume, and it is usually what the call is really about.
 
-> PLACEHOLDER pull quote from the video interviews — something in Dan's own words about
-> what he was afraid of and what actually happened.
+- No acquisition, no roll-up, no multiple of revenue
+- No timeline you did not set
+- No obligation of any kind from a first conversation
 
-## What this is not
+What we care about is whether the people who trusted you keep being looked after. Everything else follows from that.
 
-PLACEHOLDER — Sam's doc is explicit that the tone is attraction, not promotion. This
-section is where that gets stated plainly: not a buyer, not a roll-up, not a valuation
-pitch, no pressure and no timeline.
+> Money is only a tool for building the life you want. That is true of the practice you built with it, too.
 
-- PLACEHOLDER — not an acquisition play
-- PLACEHOLDER — not a referral mill
-- PLACEHOLDER — no obligation, no timeline
+## What actually happened here
 
-## How it actually works
+One of our own advisers went through this. He built a practice over decades, reached the point of thinking about what came next, and handed it to a colleague who is still looking after those same families today.
 
-PLACEHOLDER — the substance. This is the section that has to deliver on the promise the
-videos and ads made, with the right balance of detail and brevity.
+He is not a case study we bought. He works here. So does the person who took over.
 
 [video:dans-decision]
 
+## What we would want to know
+
+If we were sitting where you are, these are the questions we would want answered before we told anyone we were thinking about it.
+
+### Who actually ends up looking after my clients?
+
+A named person, with a practice of their own and a reason to care — not a service centre and not a queue.
+
+### What happens to my name?
+
+Whatever you want to happen to it. Some advisers want continuity of the name they built. Others want a clean handover. Both are fine.
+
+### How long does it take?
+
+Longer than a transaction and shorter than you fear. It depends entirely on what you want, which is why the first conversation is a conversation and not a proposal.
+
 [cta:checklist]
 
-## Questions worth answering first
+## Start wherever you want
 
-PLACEHOLDER — bridge into the checklist. Sam's plan positions the checklist as the primary
-download and the main source of follow-up conversations.
+You can read the whole story first, take the checklist away and think about it, or just talk to someone. There is no wrong order and no sequence we are trying to move you through.
 
 [cta:contact]

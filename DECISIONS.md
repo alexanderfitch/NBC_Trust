@@ -238,3 +238,42 @@ misrepresented the border. Hence full-resolution source plus local simplificatio
 Also: `--land` / `--land-line` / `--land-label` tokens added to all four theme blocks so the
 basemap follows light/dark; the `KS` label was moved to (381,532) because at (200,472) it collided
 with the "90 mi" ring label, which sits on the down-left diagonal with the other two.
+
+## D-022 · 2026-09-10 · Microsite visual design: refresh of nbctrustco.com, not a departure
+Brief: make the microsite look polished and high-end for client meetings, reading as a modern
+refresh of their existing site. Audited nbctrustco.com and pulled the real brand values from its
+live stylesheet rather than guessing: **navy `#003D68`** (primary) and **orange `#FF6716`**
+(accent), with a heavy serif wordmark. Also confirmed from their team page that **Dan Badeer** is a
+real adviser there and **Kaci** is his assistant — the case-study subjects in Sam's doc are real
+people, so naming and consent are Sam's and legal's call, not a copy decision.
+**Inherited** (so it reads as the same company): the navy, the orange, and serif display type —
+their logo is a serif, so editorial serif here is continuity.
+**Deliberately left behind** (what dates the current site): dark photo-overlay hero, seven-item
+nav, stock photography, bulleted list as a hero, boxed drop-shadow cards, bolted-on accessibility
+widget.
+**Register:** quiet confidence — the reader is contemplating the end of a career they built, and
+the firm asking for that trust is a fiduciary. Editorial serif display, generous measure, hairline
+rules instead of boxes, orange used about twice a page. Closer to a private bank's annual review
+than a SaaS landing page. Still system fonts only: no CDN, no webfont round-trip, no third-party
+request from a regulated public site.
+**Structural addition:** `split_hero()` peels the leading `# heading` and its following paragraphs
+into a distinct typographic hero region. That separation is most of what makes a page read as
+designed rather than as a document.
+**Draft copy:** the pages now carry plausible draft copy rather than visible `PLACEHOLDER` notes,
+because scaffolding text all over the page undercuts a meeting. Honesty is preserved instead by
+per-page `status: draft` front matter, a discreet "Draft — design review copy" ribbon, and
+`--check` listing every draft page. `show_draft_notice: false` hides the ribbon for a clean
+screen-share; it changes the ribbon, not the facts. Sam still owns final copy. The draft copy
+turns their own site's line ("begin with the end in mind") back on the adviser, avoids any
+guarantee, and contains no age language (D-012).
+**Two real bugs found while verifying, both mine:**
+(1) the pending-video placeholder used a gradient `border-box` trick that the solid border painted
+straight over, leaving a box 3% off the page colour — effectively invisible. Now a dashed rule plus
+a faint diagonal hatch.
+(2) `.prose p` (0-1-1) silently outranked `.video__note` (0-1-0), so those tokens were being
+ignored. Now scoped under `.video`, and small text deliberately uses `--ink-2` rather than
+`--ink-3`, which lands at 3.9:1 on the page ground and fails AA at 13–15px.
+Contrast verified in-browser across the palette: body 7.34:1, headings 15.64:1, CTA body on navy
+7.46:1, button label on orange 5.6:1, footer body 8.43:1 — all clear of AA. (First measurement
+run reported false failures because Chromium serialises `color-mix()` as `color(srgb 0-1)` floats
+and the checker assumed 0-255; worth remembering when spot-checking contrast.)

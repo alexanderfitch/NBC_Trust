@@ -141,6 +141,30 @@ def _render_video(slug, videos):
         '</figure>' % (poster, html.escape(meta["src"]), caption))
 
 
+def split_hero(body):
+    """Peel the leading ``# heading`` and the paragraphs after it off the body.
+
+    The hero is a distinct typographic region, not just the first heading in a
+    wall of prose -- that separation is most of what makes the page read as
+    designed rather than as a document. Everything from the first ``##`` onward
+    stays in the body.
+    """
+    blocks = re.split(r"\n\s*\n", body.strip())
+    heading, lede, rest = "", [], []
+    i = 0
+    if i < len(blocks) and blocks[i].strip().startswith("# "):
+        heading = blocks[i].strip()[2:].strip()
+        i += 1
+        while i < len(blocks):
+            b = blocks[i].strip()
+            if b.startswith("#") or b.startswith("["):
+                break
+            lede.append(b)
+            i += 1
+    rest = blocks[i:]
+    return heading, lede, "\n\n".join(rest)
+
+
 def _render_cta(kind):
     if kind == "checklist":
         return (
@@ -148,8 +172,8 @@ def _render_cta(kind):
             '  <h2>The succession checklist</h2>\n'
             '  <p>A practical starting point &mdash; the questions worth answering '
             'before you talk to anyone.</p>\n'
-            '  <a class="button" href="#checklist-form">Get the checklist</a>\n'
-            '</aside>')
+            '  <a class="button" href="%s">Get the checklist</a>\n'
+            '</aside>' % "#checklist-form")
     if kind == "contact":
         return (
             '<aside class="cta cta--contact">\n'
@@ -190,6 +214,11 @@ def _structured_data(page, site):
 def render_page(page, site, template, nav_html):
     out = template
     replacements = {
+        "{{eyebrow}}": html.escape(page.get("eyebrow", "")),
+        "{{heading}}": page.get("heading_html") or html.escape(page["title"]),
+        "{{lede}}": page.get("lede_html", ""),
+        "{{footer_nav}}": page.get("footer_nav", ""),
+        "{{draft_notice}}": page.get("draft_notice", ""),
         "{{title}}": html.escape(page["title"]),
         "{{description}}": html.escape(page["description"]),
         "{{canonical}}": html.escape(site["base_url"].rstrip("/") + page["url"]),
@@ -271,6 +300,8 @@ def collect_pages(site):
             "nav_label": meta.get("nav_label") or entry.get("nav_label"),
             "in_nav": entry.get("in_nav", True),
             "schema_type": meta.get("schema_type", entry.get("schema_type", "WebPage")),
+            "eyebrow": meta.get("eyebrow", "Honorable Exit"),
+            "status": meta.get("status", "final"),
             "body_md": body,
         }
         pages.append(page)
@@ -307,7 +338,11 @@ def build(check_only=False, local=False):
     videos = site.get("videos", {})
 
     for p in pages:
-        p["body_html"] = _render_blocks(p["body_md"], videos)
+        heading, lede, rest = split_hero(p["body_md"])
+        p["heading_html"] = _inline(heading) if heading else html.escape(p["title"])
+        p["lede_html"] = "\n".join('<p class="hero__lede">%s</p>' % _inline(l.replace("\n", " "))
+                                    for l in lede)
+        p["body_html"] = _render_blocks(rest, videos)
 
     placeholders = find_placeholders(pages)
 
@@ -319,6 +354,11 @@ def build(check_only=False, local=False):
                 print("  %s:%d  %s" % (name, line_no, text[:90]))
         else:
             print("\nNo placeholders -- all copy is real.")
+        drafts = [p["content_path"].name for p in pages if p["status"] == "draft"]
+        if drafts:
+            print("\nPages still marked status: draft (%d): %s"
+                  % (len(drafts), ", ".join(drafts)))
+
         pending = [s for s, v in videos.items() if not v.get("src")]
         if pending:
             print("\nVideo slots with no file yet (%d): %s" % (len(pending), ", ".join(pending)))
@@ -329,8 +369,22 @@ def build(check_only=False, local=False):
 
     tools = collect_local_tools(site, local_build)
 
+    footer_nav = "".join('<li><a href="%s">%s</a></li>'
+                         % (html.escape(q["url"]),
+                            html.escape(q.get("nav_label") or q["title"]))
+                         for q in pages if q.get("in_nav", True))
+
+    show_draft = site.get("show_draft_notice", True)
+
     for p in pages:
         nav = _nav_html(pages, p["slug"], tools)
+        p["footer_nav"] = footer_nav
+        p["draft_notice"] = ""
+        if show_draft and p["status"] == "draft":
+            p["draft_notice"] = (
+                '<div class="draft"><strong>Draft</strong>'
+                'Design review copy. Wording is a working draft pending the '
+                'messaging strategy, and the videos are placeholders.</div>')
         out_html = render_page(p, site, template, nav)
         if p["slug"] == "index":
             out_path = DIST_DIR / "index.html"
