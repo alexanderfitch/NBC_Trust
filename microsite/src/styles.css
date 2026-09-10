@@ -81,6 +81,21 @@ body {
 .nav a:hover, .nav a:focus-visible { color: var(--ink); border-bottom-color: var(--accent); }
 .nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
 
+/* Internal-only convenience link, present in --local preview builds only.
+   Styled unlike the real nav so it can never be mistaken for a public page. */
+.nav__tool a {
+  color: #7a2318;
+  font-size: 0.8125rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+}
+.nav__tool a:hover, .nav__tool a:focus-visible { background: #7a2318; color: #fff; border-color: #7a2318; }
+@media (prefers-color-scheme: dark) {
+  .nav__tool a { color: #e8907f; }
+  .nav__tool a:hover, .nav__tool a:focus-visible { background: #e8907f; color: #171513; border-color: #e8907f; }
+}
+
 /* prose ---------------------------------------------------------------- */
 
 .prose { padding-block: 4rem 5rem; }

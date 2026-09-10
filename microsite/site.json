@@ -30,6 +30,14 @@
       "schema_type": "WebPage"
     }
   ],
+  "local_tools": [
+    {
+      "slug": "dashboard",
+      "label": "Dashboard (internal)",
+      "source": "docs/dashboard/prospect_dashboard.html"
+    }
+  ],
+  "_local_tools_note": "INTERNAL ONLY. Convenience links included in --local preview builds so working tools sit one click from the site. They are NEVER emitted by a production build and never appear in the sitemap -- the dashboard contains the proprietary scored prospect list (named firms, phone numbers, readiness scores). Guarded by a test.",
   "videos": {
     "why-we-do-this": {
       "working_title": "Why we do this",

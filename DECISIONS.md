@@ -195,3 +195,20 @@ Sub-decisions:
 Design intent recorded in styles.css: editorial serif and generous measure, because the reader is
 contemplating the end of a career they built — a SaaS landing page would be the wrong register.
 Palette and domain are PLACEHOLDER pending NBC's real brand values.
+
+## D-020 · 2026-09-10 · Internal dashboard reachable from the microsite, in preview builds only
+Wanted: the prospect dashboard one click from the microsite while working. **Problem:** the
+microsite is public by design (D-017), and the dashboard contains the proprietary scored prospect
+list — 111 named firms with phone numbers, distances, AUM and succession-readiness scores. A nav
+link on a public site would publish the client's confidential prospecting strategy.
+**Decision:** `local_tools` in `microsite/site.json`, emitted **only** by `build.py --local`.
+`collect_local_tools()` returns `[]` when `local` is false, which is the entire guard — no page is
+written, no nav link rendered, and `_sitemap()` only ever receives `pages`, so tools cannot reach
+the sitemap by construction. Six tests in `microsite/tests/test_build.py` assert the production
+build emits nothing: no directory, no nav entry, no sitemap line. Verified by building both ways
+and grepping the output for prospect data (CRD 141373 / MJB FINANCIAL) — clean.
+Defence in depth: the copied page gets a sticky red "INTERNAL — confidential prospect data. Local
+preview build only; never published" banner injected after `<body>`, and the nav link is styled as
+a red outlined pill, deliberately unlike every real nav item, so neither the link nor the page can
+be mistaken for public. A missing tool source is skipped with a notice rather than failing the
+build, so a moved dashboard never blocks a preview.

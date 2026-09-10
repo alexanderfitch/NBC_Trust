@@ -207,7 +207,7 @@ def render_page(page, site, template, nav_html):
     return out
 
 
-def _nav_html(pages, current_slug):
+def _nav_html(pages, current_slug, tools=()):
     items = []
     for p in pages:
         if not p.get("in_nav", True):
@@ -215,7 +215,38 @@ def _nav_html(pages, current_slug):
         aria = ' aria-current="page"' if p["slug"] == current_slug else ""
         items.append('<li><a href="%s"%s>%s</a></li>'
                      % (html.escape(p["url"]), aria, html.escape(p.get("nav_label", p["title"]))))
+    for t in tools:
+        aria = ' aria-current="page"' if t["slug"] == current_slug else ""
+        items.append('<li class="nav__tool"><a href="%s"%s>%s</a></li>'
+                     % (html.escape(t["url"]), aria, html.escape(t["label"])))
     return "<ul>%s</ul>" % "".join(items)
+
+
+def collect_local_tools(site, local):
+    """Internal convenience links, included ONLY in --local preview builds.
+
+    These point at working tools that hold confidential data -- the prospect
+    dashboard lists named firms with phone numbers and readiness scores. A
+    production build must never emit them, never link them, and never put them
+    in the sitemap. Returning [] unless ``local`` is the whole guard, and
+    tests/test_build.py asserts it.
+    """
+    if not local:
+        return []
+    prefix = site.get("path_prefix", "").rstrip("/")
+    tools = []
+    for entry in site.get("local_tools", []):
+        src = MICROSITE_ROOT.parent / entry["source"]
+        if not src.exists():
+            print("  skipping local tool %r -- source not found: %s" % (entry["slug"], src))
+            continue
+        tools.append({
+            "slug": entry["slug"],
+            "label": entry["label"],
+            "url": "%s/%s/" % (prefix, entry["slug"]),
+            "source_path": src,
+        })
+    return tools
 
 
 def collect_pages(site):
@@ -296,8 +327,10 @@ def build(check_only=False, local=False):
     template = (SRC_DIR / "template.html").read_text(encoding="utf-8")
     DIST_DIR.mkdir(parents=True, exist_ok=True)
 
+    tools = collect_local_tools(site, local_build)
+
     for p in pages:
-        nav = _nav_html(pages, p["slug"])
+        nav = _nav_html(pages, p["slug"], tools)
         out_html = render_page(p, site, template, nav)
         if p["slug"] == "index":
             out_path = DIST_DIR / "index.html"
@@ -306,6 +339,27 @@ def build(check_only=False, local=False):
             out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(out_html, encoding="utf-8")
         print("built %s -> %s" % (p["content_path"].name, out_path.relative_to(MICROSITE_ROOT)))
+
+    for t in tools:
+        # Copied verbatim: these are standalone tools with their own styling,
+        # not microsite pages. A banner is injected so it is unmistakable that
+        # the page is internal and which build produced it.
+        raw = t["source_path"].read_text(encoding="utf-8")
+        banner = (
+            '<div style="position:sticky;top:0;z-index:99;background:#7a2318;color:#fff;'
+            'font:600 13px/1.4 -apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;'
+            'padding:10px 16px;text-align:center">'
+            'INTERNAL &mdash; confidential prospect data. Local preview build only; '
+            'never published. <a href="%s" style="color:#fff">&larr; back to the site</a>'
+            '</div>' % html.escape((site.get("path_prefix", "").rstrip("/") or "") + "/"))
+        marker = "<body>"
+        raw = (raw.replace(marker, marker + "\n" + banner, 1) if marker in raw
+               else banner + raw)
+        tool_path = DIST_DIR / t["slug"] / "index.html"
+        tool_path.parent.mkdir(parents=True, exist_ok=True)
+        tool_path.write_text(raw, encoding="utf-8")
+        print("built %s (INTERNAL, local only) -> %s"
+              % (t["source_path"].name, tool_path.relative_to(MICROSITE_ROOT)))
 
     (DIST_DIR / "styles.css").write_text(
         (SRC_DIR / "styles.css").read_text(encoding="utf-8"), encoding="utf-8")

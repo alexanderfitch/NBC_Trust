@@ -140,6 +140,46 @@ class TestPlaceholderDetection(unittest.TestCase):
         self.assertEqual(build.find_placeholders(pages), [])
 
 
+class TestLocalToolsNeverShip(unittest.TestCase):
+    """The dashboard holds named firms, phone numbers and readiness scores.
+    A production build must not emit it, link it, or list it in the sitemap."""
+
+    def _site(self):
+        return build.load_site_config()
+
+    def test_production_build_collects_no_tools(self):
+        self.assertEqual(build.collect_local_tools(self._site(), local=False), [])
+
+    def test_local_build_does_collect_them(self):
+        tools = build.collect_local_tools(self._site(), local=True)
+        self.assertTrue(tools, "expected the dashboard tool in a local build")
+        self.assertEqual(tools[0]["slug"], "dashboard")
+
+    def test_tools_are_absent_from_production_nav(self):
+        pages = [{"slug": "index", "url": "/", "title": "Home", "in_nav": True}]
+        nav = build._nav_html(pages, "index", build.collect_local_tools(self._site(), local=False))
+        self.assertNotIn("nav__tool", nav)
+        self.assertNotIn("dashboard", nav)
+
+    def test_tools_appear_in_local_nav(self):
+        pages = [{"slug": "index", "url": "/", "title": "Home", "in_nav": True}]
+        nav = build._nav_html(pages, "index", build.collect_local_tools(self._site(), local=True))
+        self.assertIn("nav__tool", nav)
+        self.assertIn("dashboard", nav)
+
+    def test_sitemap_never_includes_tools(self):
+        site = self._site()
+        pages = [{"slug": "index", "url": "/succession/"}]
+        xml = build._sitemap(pages, site)
+        self.assertNotIn("dashboard", xml)
+
+    def test_missing_source_is_skipped_not_fatal(self):
+        site = dict(self._site())
+        site["local_tools"] = [{"slug": "ghost", "label": "Ghost",
+                                "source": "docs/does-not-exist.html"}]
+        self.assertEqual(build.collect_local_tools(site, local=True), [])
+
+
 class TestRealContentBuilds(unittest.TestCase):
     """The committed content must actually build -- catches a broken site.json."""
 
