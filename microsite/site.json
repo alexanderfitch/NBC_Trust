@@ -1,0 +1,66 @@
+{
+  "organization": "NBC Trust",
+  "base_url": "https://www.nbctrust.com",
+  "path_prefix": "/succession",
+  "_path_prefix_note": "Where the microsite is mounted. PLAN.md decision #6: main domain at /succession vs a subdomain. If it becomes a subdomain root, set this to \"\". Build with --local to preview at a server root.",
+  "_base_url_note": "PLACEHOLDER - confirm the real domain and whether the microsite lives at /succession or on a subdomain (PLAN.md decision #6).",
+  "pages": [
+    {
+      "slug": "index",
+      "content": "hub.md",
+      "nav_label": "Overview",
+      "schema_type": "WebPage"
+    },
+    {
+      "slug": "story",
+      "content": "case-study.md",
+      "nav_label": "Dan's story",
+      "schema_type": "Article"
+    },
+    {
+      "slug": "next-generation",
+      "content": "next-generation.md",
+      "nav_label": "For next-generation advisors",
+      "schema_type": "WebPage"
+    },
+    {
+      "slug": "checklist",
+      "content": "checklist.md",
+      "nav_label": "The checklist",
+      "schema_type": "WebPage"
+    }
+  ],
+  "videos": {
+    "why-we-do-this": {
+      "working_title": "Why we do this",
+      "src": null,
+      "poster": null,
+      "caption": "PLACEHOLDER caption"
+    },
+    "dans-decision": {
+      "working_title": "Dan's decision",
+      "src": null,
+      "poster": null,
+      "caption": "PLACEHOLDER caption"
+    },
+    "the-handover": {
+      "working_title": "The handover",
+      "src": null,
+      "poster": null,
+      "caption": "PLACEHOLDER caption"
+    },
+    "morgans-view": {
+      "working_title": "Morgan's view",
+      "src": null,
+      "poster": null,
+      "caption": "PLACEHOLDER caption"
+    },
+    "what-clients-felt": {
+      "working_title": "What clients felt",
+      "src": null,
+      "poster": null,
+      "caption": "PLACEHOLDER caption"
+    }
+  },
+  "_videos_note": "Working titles are my guesses at the 4-5 shorts Sam's doc calls for. Drew's actual edit list replaces these. Slugs are referenced from content as [video:slug]."
+}

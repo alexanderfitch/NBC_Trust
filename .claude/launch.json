@@ -4,8 +4,30 @@
     {
       "name": "dashboard",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8756", "--bind", "127.0.0.1", "-d", "docs/dashboard"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8756",
+        "--bind",
+        "127.0.0.1",
+        "-d",
+        "docs/dashboard"
+      ],
       "port": 8756
+    },
+    {
+      "name": "microsite",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8757",
+        "--bind",
+        "127.0.0.1",
+        "-d",
+        "microsite/dist"
+      ],
+      "port": 8757
     }
   ]
 }

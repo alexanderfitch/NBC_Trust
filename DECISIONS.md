@@ -166,3 +166,32 @@ README layout, docs/PHASE2_AIRTABLE.md command paths. Verified: 53/53 tests pass
 writes to `data-engine/data/processed/`, `EXCLUSIONS_PATH` resolves to the monorepo root.
 **Not rewritten:** path references inside DATA_QUALITY_REPORT.md and earlier DECISIONS entries.
 Those are dated audit records and were accurate when written; this entry is the forward pointer.
+
+## D-019 · 2026-09-09 · Microsite: copy/markup separation, stdlib static build
+Building Stage C infrastructure before Sam's copy exists requires that integrating the real copy
+later is *not* a rebuild. **Decision:** copy lives in `microsite/content/*.md`, markup in
+`microsite/src/template.html`, joined by a stdlib-only builder (`microsite/build.py`, no pip, no
+toolchain — same constraint as D-005). Sam edits markdown and never touches HTML; when his copy
+lands it is a file swap. Side benefit: every page's copy is a versioned file in git, which
+satisfies PLAN.md Stage F1 (public-asset versioning) for free rather than as extra work.
+Sub-decisions:
+- **Markdown subset is deliberately tiny** (headings, lists, blockquote, `**bold**`, `*italic*`,
+  links, plus `[video:slug]` and `[cta:kind]` slots). A hand-rolled parser is only defensible
+  while it stays small; anything unrecognised is emitted as a paragraph rather than silently
+  dropped, so no copy can vanish.
+- **Copy is HTML-escaped before inline formatting is applied.** Copy is human-authored and must
+  never be able to inject markup; tested both ways.
+- **`path_prefix` in site.json is the single source of truth for the mount point**, so PLAN.md
+  decision #6 (main domain `/succession` vs a subdomain root) is a one-line config change, not a
+  find-and-replace. `--local` builds with an empty prefix for preview and prints a do-not-deploy
+  warning, since its canonical URLs omit the prefix.
+- **Placeholders are marked with a literal `PLACEHOLDER` token** and `build.py --check` lists every
+  one with file and line. Nothing placeholder-y can reach production unnoticed; the build prints a
+  running count.
+- **Video slots render labelled placeholders** until Drew delivers, so the page is reviewable now
+  and the embed is already wired.
+- **System fonts only, no CDN.** No webfont round-trip, no third-party dependency on a regulated
+  public site, and the performance budget stays intact.
+Design intent recorded in styles.css: editorial serif and generous measure, because the reader is
+contemplating the end of a career they built — a SaaS landing page would be the wrong register.
+Palette and domain are PLACEHOLDER pending NBC's real brand values.

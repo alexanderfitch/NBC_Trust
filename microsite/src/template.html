@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} — {{organization}}</title>
+<meta name="description" content="{{description}}">
+<link rel="canonical" href="{{canonical}}">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{canonical}}">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="stylesheet" href="{{stylesheet}}">
+<script type="application/ld+json">
+{{structured_data}}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="wordmark" href="{{home}}">{{organization}}</a>
+    <nav class="nav" aria-label="Succession">
+      {{nav}}
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap prose">
+{{body}}
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p>&copy; {{year}} {{organization}}. Built {{build_date}}.</p>
+    <p class="footer__note">
+      PLACEHOLDER — required footer disclosures, privacy policy link and regulatory
+      language pending compliance-attorney review (PLAN.md Stage D6).
+    </p>
+  </div>
+</footer>
+</body>
+</html>
