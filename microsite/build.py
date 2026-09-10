@@ -30,6 +30,7 @@ from pathlib import Path
 MICROSITE_ROOT = Path(__file__).resolve().parent
 CONTENT_DIR = MICROSITE_ROOT / "content"
 SRC_DIR = MICROSITE_ROOT / "src"
+ASSETS_DIR = MICROSITE_ROOT / "assets"
 DIST_DIR = MICROSITE_ROOT / "dist"
 SITE_CONFIG = MICROSITE_ROOT / "site.json"
 
@@ -227,6 +228,8 @@ def render_page(page, site, template, nav_html):
         "{{nav}}": nav_html,
         "{{structured_data}}": _structured_data(page, site),
         "{{stylesheet}}": html.escape((site.get("path_prefix", "").rstrip("/") or "") + "/styles.css"),
+        "{{assets}}": html.escape((site.get("path_prefix", "").rstrip("/") or "") + "/assets"),
+        "{{canonical_origin}}": html.escape(site["base_url"].rstrip("/")),
         "{{home}}": html.escape((site.get("path_prefix", "").rstrip("/") or "") + "/"),
         "{{build_date}}": date.today().isoformat(),
         "{{year}}": str(date.today().year),
@@ -414,6 +417,16 @@ def build(check_only=False, local=False):
         tool_path.write_text(raw, encoding="utf-8")
         print("built %s (INTERNAL, local only) -> %s"
               % (t["source_path"].name, tool_path.relative_to(MICROSITE_ROOT)))
+
+    # Ship assets/ (icons now; video posters and the checklist PDF later).
+    # The generator script itself is not an asset -- keep it out of the output.
+    assets_out = DIST_DIR / "assets"
+    if ASSETS_DIR.exists():
+        assets_out.mkdir(parents=True, exist_ok=True)
+        for src in sorted(ASSETS_DIR.iterdir()):
+            if src.is_file() and src.suffix.lower() != ".py":
+                (assets_out / src.name).write_bytes(src.read_bytes())
+                print("asset  %s" % src.name)
 
     (DIST_DIR / "styles.css").write_text(
         (SRC_DIR / "styles.css").read_text(encoding="utf-8"), encoding="utf-8")

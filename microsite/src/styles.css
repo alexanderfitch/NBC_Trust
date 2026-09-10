@@ -25,7 +25,8 @@
 
 :root {
   /* brand */
-  --navy:        #003d68;
+  --navy:        #003d68;   /* their stylesheet: the site's ink */
+  --logo-blue:   #1260a8;   /* sampled from their actual logo PNG */
   --navy-deep:   #002843;
   --navy-soft:   #1c5480;
   --orange:      #ff6716;
@@ -53,6 +54,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --navy:        #7fb2d9;
+    --logo-blue:   #64a6dd;
     --navy-deep:   #0a1620;
     --navy-soft:   #a8cbe6;
     --orange:      #ff8442;
@@ -113,16 +115,30 @@ body {
 }
 
 /* Wordmark echoes their logo: heavy serif "NBC", letterspaced caps beneath. */
-.wordmark { text-decoration: none; display: inline-flex; align-items: baseline; gap: 0.5rem; }
+/* Their logo is a stacked lockup: heavy serif "NBC" over letterspaced serif
+   caps. Reproduced in text rather than as an image so it stays crisp at any
+   zoom, selectable, and legible to a screen reader. The blue is the one
+   sampled from their logo, not the darker one their stylesheet uses for ink. */
+.wordmark {
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.5625rem;
+}
 .wordmark__mark {
   font: 700 1.5rem/1 var(--serif);
-  color: var(--navy); letter-spacing: -0.02em;
+  color: var(--logo-blue);
+  letter-spacing: 0.005em;
+  transition: color .2s ease;
 }
 .wordmark__rest {
-  font: 600 0.625rem/1 var(--sans);
-  letter-spacing: 0.18em; text-transform: uppercase;
+  display: flex; flex-direction: column; gap: 0.1875rem;
+  font: 400 0.5rem/1 var(--serif);
+  letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--ink-3);
+  padding-top: 0.125rem;
+  transition: color .2s ease;
 }
+.wordmark:hover .wordmark__mark { color: var(--navy); }
+.wordmark:hover .wordmark__rest { color: var(--ink-2); }
 
 .nav ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1.75rem; margin: 0; padding: 0; list-style: none; }
 .nav a {
@@ -400,4 +416,91 @@ body {
   .masthead, .nav, .cta, .skip, .draft { display: none; }
   body { background: #fff; color: #000; }
   .footer { background: none; color: #000; }
+}
+
+/* ══ motion ═══════════════════════════════════════════════════════════════
+ * Every animation below is subtle by intent and gated on
+ * prefers-reduced-motion. On a site whose whole subject is trust, motion that
+ * draws attention to itself works against the message -- the aim is that
+ * navigation feels unhurried rather than that anything looks animated.
+ *
+ * Nothing here is load-bearing: with JS disabled or motion reduced, all
+ * content is fully visible and the site behaves exactly as it does now.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* Cross-document transitions: same-origin navigations crossfade instead of
+   flashing white. Chromium honours this today; every other browser simply
+   navigates as normal. */
+@view-transition { navigation: auto; }
+
+::view-transition-old(root) { animation: vt-out .18s ease both; }
+::view-transition-new(root) { animation: vt-in .26s ease both; }
+
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* The masthead is shared across pages, so pin it as its own transition group
+   and it stays put while the content beneath crossfades. */
+.masthead { view-transition-name: masthead; }
+::view-transition-group(masthead) { animation-duration: .18s; }
+
+/* Hero entry: a short rise on first paint. Staggered a touch so the eyebrow,
+   heading and lede arrive in reading order rather than all at once. */
+.hero__eyebrow, .hero h1, .hero__lede {
+  animation: rise .55s cubic-bezier(.2, .7, .3, 1) both;
+}
+.hero__eyebrow { animation-delay: .02s; }
+.hero h1 { animation-delay: .08s; }
+.hero__lede { animation-delay: .16s; }
+.hero__lede + .hero__lede { animation-delay: .22s; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The eyebrow rule draws itself in, which is the one flourish on the page. */
+.hero__eyebrow::before {
+  transform-origin: left center;
+  animation: draw .5s .3s cubic-bezier(.2, .7, .3, 1) both;
+}
+@keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Scroll reveal. Default state is fully visible: the `.reveal` class is only
+   added by JS once it has confirmed IntersectionObserver support, so content
+   can never be stranded invisible. */
+.js-reveal .reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .6s cubic-bezier(.2, .7, .3, 1),
+              transform .6s cubic-bezier(.2, .7, .3, 1);
+  will-change: opacity, transform;
+}
+.js-reveal .reveal.is-in { opacity: 1; transform: none; will-change: auto; }
+
+/* Interaction polish */
+.nav a, .prose a, .footer a, .button { transition: color .18s ease, background-color .18s ease,
+                                                    border-color .18s ease, transform .18s ease; }
+.cta { transition: transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s ease; }
+.cta:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -18px rgb(0 40 67 / 0.45); }
+
+.video video, .video__slot { transition: transform .3s cubic-bezier(.2,.7,.3,1); }
+
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  html { scroll-behavior: auto; }
+  .hero__eyebrow, .hero h1, .hero__lede, .hero__eyebrow::before {
+    animation: none !important;
+  }
+  .js-reveal .reveal {
+    opacity: 1 !important; transform: none !important; transition: none !important;
+  }
+  .cta:hover, .button:hover { transform: none; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }

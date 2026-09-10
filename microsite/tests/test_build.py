@@ -180,6 +180,65 @@ class TestLocalToolsNeverShip(unittest.TestCase):
         self.assertEqual(build.collect_local_tools(site, local=True), [])
 
 
+class TestBrandAssets(unittest.TestCase):
+    """Icons and the asset pipeline."""
+
+    def test_icons_exist_at_every_declared_size(self):
+        for name in ("icon-32.png", "icon-180.png", "icon-512.png"):
+            self.assertTrue((build.ASSETS_DIR / name).exists(), "missing %s" % name)
+
+    def test_icons_are_real_pngs(self):
+        for name in ("icon-32.png", "icon-180.png", "icon-512.png"):
+            head = (build.ASSETS_DIR / name).read_bytes()[:8]
+            self.assertEqual(head, b"\x89PNG\r\n\x1a\n", "%s is not a PNG" % name)
+
+    def test_generator_script_is_not_shipped_as_an_asset(self):
+        """make_icons.py needs PIL and is a build tool, not site content."""
+        self.assertTrue((build.ASSETS_DIR / "make_icons.py").exists())
+        shipped = build.DIST_DIR / "assets" / "make_icons.py"
+        self.assertFalse(shipped.exists(), "the generator must not be published")
+
+
+class TestMotion(unittest.TestCase):
+    """Motion must be gated and must never be able to strand content."""
+
+    def _css(self):
+        return (build.SRC_DIR / "styles.css").read_text(encoding="utf-8")
+
+    def _template(self):
+        return (build.SRC_DIR / "template.html").read_text(encoding="utf-8")
+
+    def test_reduced_motion_block_exists(self):
+        self.assertIn("prefers-reduced-motion: reduce", self._css())
+
+    def test_reduced_motion_disables_view_transitions(self):
+        css = self._css()
+        block = css[css.index("prefers-reduced-motion: reduce"):]
+        self.assertIn("navigation: none", block)
+
+    def test_reduced_motion_forces_reveals_visible(self):
+        css = self._css()
+        block = css[css.index("prefers-reduced-motion: reduce"):]
+        self.assertIn("opacity: 1 !important", block)
+
+    def test_hidden_state_is_gated_behind_the_js_class(self):
+        """Without .js-reveal on <html>, .reveal must not hide anything --
+        that is what makes a failed script harmless."""
+        css = self._css()
+        self.assertIn(".js-reveal .reveal", css)
+        self.assertNotRegex(css, r"(?m)^\.reveal\s*\{[^}]*opacity:\s*0")
+
+    def test_script_bails_on_reduced_motion(self):
+        self.assertIn("prefers-reduced-motion: reduce", self._template())
+
+    def test_script_bails_without_intersection_observer(self):
+        self.assertIn("'IntersectionObserver' in window", self._template())
+
+    def test_script_has_a_failsafe(self):
+        t = self._template()
+        self.assertIn("classList.remove('js-reveal')", t)
+
+
 class TestRealContentBuilds(unittest.TestCase):
     """The committed content must actually build -- catches a broken site.json."""
 

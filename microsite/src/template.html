@@ -6,14 +6,19 @@
 <title>{{title}} — {{organization}}</title>
 <meta name="description" content="{{description}}">
 <link rel="canonical" href="{{canonical}}">
-<meta name="theme-color" content="#003d68">
+<meta name="theme-color" content="#1260a8">
+
+<link rel="icon" href="{{assets}}/icon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="{{assets}}/icon-512.png" sizes="512x512" type="image/png">
+<link rel="apple-touch-icon" href="{{assets}}/icon-180.png">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{organization}}">
 <meta property="og:title" content="{{title}}">
 <meta property="og:description" content="{{description}}">
 <meta property="og:url" content="{{canonical}}">
-<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="{{canonical_origin}}{{assets}}/icon-512.png">
+<meta name="twitter:card" content="summary">
 
 <link rel="stylesheet" href="{{stylesheet}}">
 <script type="application/ld+json">
@@ -26,9 +31,9 @@
 
 <header class="masthead">
   <div class="wrap masthead__inner">
-    <a class="wordmark" href="{{home}}">
+    <a class="wordmark" href="{{home}}" aria-label="{{organization}} — succession">
       <span class="wordmark__mark">NBC</span>
-      <span class="wordmark__rest">Trust Company</span>
+      <span class="wordmark__rest"><span>Trust</span><span>Company</span></span>
     </a>
     <nav class="nav" aria-label="Succession">
       {{nav}}
@@ -79,5 +84,65 @@
     </p>
   </div>
 </footer>
+<script>
+/* Scroll reveal — progressive enhancement, deliberately conservative.
+ *
+ * Bails out entirely if IntersectionObserver is missing or the visitor has
+ * asked for reduced motion. The `.reveal` class is only ever added AFTER those
+ * checks pass, and `.js-reveal` on <html> gates the CSS, so with no JS the
+ * page is simply fully visible — content can never be stranded invisible by a
+ * script that failed to run.
+ *
+ * Only elements starting BELOW the fold are tagged. Above-the-fold content is
+ * left static because the hero already has its own entry animation, and
+ * animating both at once reads as busy rather than smooth.
+ */
+(function () {
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced || !('IntersectionObserver' in window)) return;
+
+  var targets = document.querySelectorAll(
+    '.prose h2, .prose blockquote, .prose .video, .prose .cta, .prose ul');
+  var fold = window.innerHeight * 0.9;
+  var tagged = [];
+
+  for (var i = 0; i < targets.length; i++) {
+    if (targets[i].getBoundingClientRect().top > fold) {
+      targets[i].classList.add('reveal');
+      tagged.push(targets[i]);
+    }
+  }
+  if (!tagged.length) return;
+
+  document.documentElement.classList.add('js-reveal');
+
+  var fired = false;
+  var io = new IntersectionObserver(function (entries) {
+    fired = true;
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('is-in');
+      io.unobserve(e.target);          // one-way: never animate back out
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 });
+
+  tagged.forEach(function (el) { io.observe(el); });
+
+  /* Failsafe. IntersectionObserver can exist and still never fire — a page
+   * that is never rendered (loaded in a hidden tab, some embedded webviews,
+   * a headless capture) gets no callback, and the tagged elements would sit
+   * at opacity 0 with no way back. Content being briefly un-animated is a
+   * trivial cost; content being permanently invisible is not, so if no
+   * callback has arrived while the page is actually visible, drop the gating
+   * class and let everything render plainly.
+   */
+  setTimeout(function () {
+    if (!fired && document.visibilityState === 'visible') {
+      document.documentElement.classList.remove('js-reveal');
+      io.disconnect();
+    }
+  }, 2500);
+})();
+</script>
 </body>
 </html>

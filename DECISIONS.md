@@ -277,3 +277,39 @@ Contrast verified in-browser across the palette: body 7.34:1, headings 15.64:1, 
 7.46:1, button label on orange 5.6:1, footer body 8.43:1 — all clear of AA. (First measurement
 run reported false failures because Chromium serialises `color-mix()` as `color(srgb 0-1)` floats
 and the checker assumed 0-255; worth remembering when spot-checking contrast.)
+
+## D-023 · 2026-09-10 · Icons, wordmark lockup, and a gated motion system
+**Brand fidelity.** Sampled their actual logo PNG (`nbc-trust-100.png`) rather than guessing:
+the wordmark blue is **`#1260A8`**, brighter than the **`#003D68`** in their stylesheet. They
+genuinely have two blues, so both are tokens now — `--logo-blue` for the mark, `--navy` for ink
+and panels. Their logo is a stacked lockup (heavy high-contrast serif "NBC" over letterspaced
+serif caps), now reproduced as text rather than an image: crisp at any zoom, selectable, and
+legible to a screen reader.
+**Icons** (`microsite/assets/make_icons.py`, outputs committed). Their own favicon is the full
+stacked logo squeezed into 32×32, which is illegible. **Size-specific marks instead** — ordinary
+icon practice, not a compromise: at 32px three Bodoni letters go muddy because the thin strokes
+end up sub-pixel, so the tab icon is the "N" alone in Georgia Bold (sturdier thins), while 180
+and 512 carry the full "NBC" in Bodoni 72 Bold to match their wordmark. Rendered at 4× and
+downsampled with Lanczos, which gives markedly cleaner serif edges than rasterising at 32px.
+Centred on the glyph ink box rather than the font line box, or the optical centre sits low.
+**PIL is required only to regenerate the icons** — the site stays stdlib-only (D-005), the PNGs
+are committed, and building or serving never needs the script. The generator is excluded from
+`dist/` (tested) since it is a build tool, not site content.
+**Motion.** Cross-document view transitions (`@view-transition { navigation: auto }`) so
+same-origin navigation crossfades instead of flashing white; the masthead is its own transition
+group so it stays put while content beneath changes. A short staggered rise on the hero in reading
+order, the eyebrow rule drawing itself in as the single flourish, and scroll reveals on section
+headings, quotes, videos and CTAs. On a site whose subject is trust, motion that draws attention
+to itself works against the message — the aim is that navigating feels unhurried, not that
+anything looks animated.
+**Nothing about it is load-bearing.** `.reveal` only hides when `.js-reveal` is on `<html>`, which
+JS adds *after* confirming both `IntersectionObserver` support and that reduced motion is not
+requested; only below-the-fold elements are tagged, since the hero animates already and doing both
+reads as busy. Everything is disabled again under `prefers-reduced-motion`.
+**Failsafe added after a real finding:** verifying in a hidden browser pane showed that
+`IntersectionObserver` can *exist and never fire* when a page is never rendered (hidden tab, some
+webviews, headless capture) — which would leave tagged elements at opacity 0 permanently. So if no
+callback has arrived after 2.5s while the document is actually visible, the gating class is
+removed and everything renders plainly. Un-animated content is a trivial cost; invisible content
+is not. Eight tests now assert the gating, the reduced-motion overrides, and the failsafe's
+presence.
