@@ -238,6 +238,16 @@ class TestMotion(unittest.TestCase):
         t = self._template()
         self.assertIn("classList.remove('js-reveal')", t)
 
+    def test_failsafe_is_unconditional(self):
+        """It must not be gated on visibilityState. A page reporting itself
+        hidden is precisely the one whose observer never fires -- gating on
+        visibility disables the rescue in the only case that needs it."""
+        t = self._template()
+        start = t.index("setTimeout(function ()")
+        body = t[start:t.index("}, 2500);", start)]
+        self.assertNotIn("visibilityState", body)
+        self.assertIn("if (fired) return;", body)
+
 
 class TestRealContentBuilds(unittest.TestCase):
     """The committed content must actually build -- catches a broken site.json."""

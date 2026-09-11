@@ -129,18 +129,22 @@
   tagged.forEach(function (el) { io.observe(el); });
 
   /* Failsafe. IntersectionObserver can exist and still never fire — a page
-   * that is never rendered (loaded in a hidden tab, some embedded webviews,
-   * a headless capture) gets no callback, and the tagged elements would sit
-   * at opacity 0 with no way back. Content being briefly un-animated is a
-   * trivial cost; content being permanently invisible is not, so if no
-   * callback has arrived while the page is actually visible, drop the gating
-   * class and let everything render plainly.
+   * that is never rendered gets no callback, and the tagged elements would
+   * sit at opacity 0 with no way back. Seen for real in an embedded browser
+   * pane that reports document.visibilityState === 'hidden' while a person is
+   * genuinely looking at it.
+   *
+   * Deliberately UNCONDITIONAL. An earlier version only fired when the
+   * document reported itself visible, on the reasoning that a hidden tab does
+   * not need rescuing — which was exactly backwards, since a page that reports
+   * hidden is precisely the one whose observer never fires. Firing this in a
+   * tab nobody is watching costs nothing: the content is merely un-animated
+   * when they arrive. Not firing costs the content entirely.
    */
   setTimeout(function () {
-    if (!fired && document.visibilityState === 'visible') {
-      document.documentElement.classList.remove('js-reveal');
-      io.disconnect();
-    }
+    if (fired) return;
+    document.documentElement.classList.remove('js-reveal');
+    io.disconnect();
   }, 2500);
 })();
 </script>

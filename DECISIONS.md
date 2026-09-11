@@ -309,7 +309,15 @@ reads as busy. Everything is disabled again under `prefers-reduced-motion`.
 **Failsafe added after a real finding:** verifying in a hidden browser pane showed that
 `IntersectionObserver` can *exist and never fire* when a page is never rendered (hidden tab, some
 webviews, headless capture) — which would leave tagged elements at opacity 0 permanently. So if no
-callback has arrived after 2.5s while the document is actually visible, the gating class is
-removed and everything renders plainly. Un-animated content is a trivial cost; invisible content
-is not. Eight tests now assert the gating, the reduced-motion overrides, and the failsafe's
-presence.
+callback has arrived after 2.5s, the gating class is removed and everything renders plainly.
+Un-animated content is a trivial cost; invisible content is not. Nine tests now assert the gating,
+the reduced-motion overrides, and the failsafe.
+**Correction, same day:** the failsafe was first written to fire only when the document reported
+`visibilityState === 'visible'`, reasoning that a tab nobody is watching does not need rescuing.
+That was exactly backwards, and it reproduced the original bug: a page reporting itself hidden is
+*precisely* the one whose observer never fires, so the gate disabled the rescue in the only case
+that needed it. Caught by opening the site in the preview pane — which reports `hidden` while a
+person is genuinely looking at it — and finding 12 elements still at opacity 0. The timeout is now
+unconditional, with a regression test asserting `visibilityState` does not appear in it. General
+lesson worth keeping: a safety net with a precondition is only as good as the precondition, and
+the failure mode it guards against is usually the one that invalidates it.
