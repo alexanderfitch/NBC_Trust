@@ -1,5 +1,6 @@
 """Tests for the microsite builder (microsite/build.py)."""
 
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -200,7 +201,15 @@ class TestBrandAssets(unittest.TestCase):
 
 
 class TestMotion(unittest.TestCase):
-    """Motion must be gated and must never be able to strand content."""
+    """Motion must be gated, and must never be able to strand content.
+
+    History worth keeping: this was an IntersectionObserver plus a rescue
+    timer, and it stranded content at opacity 0 twice -- once because an
+    observer can exist and never fire in a page that is never rendered, and
+    again because setTimeout is throttled in exactly those pages, so the rescue
+    never ran either. It is now a scroll-driven CSS animation with no script at
+    all. These tests exist to stop that regressing.
+    """
 
     def _css(self):
         return (build.SRC_DIR / "styles.css").read_text(encoding="utf-8")
@@ -216,37 +225,44 @@ class TestMotion(unittest.TestCase):
         block = css[css.index("prefers-reduced-motion: reduce"):]
         self.assertIn("navigation: none", block)
 
-    def test_reduced_motion_forces_reveals_visible(self):
+    def test_reveal_is_hidden_only_inside_a_support_query(self):
+        """The whole safety argument: the hidden state may only exist where the
+        engine that reveals it is known to run."""
         css = self._css()
-        block = css[css.index("prefers-reduced-motion: reduce"):]
-        self.assertIn("opacity: 1 !important", block)
+        i = css.index("@keyframes reveal-in")
+        self.assertIn("opacity: 0", css[i:i + 200])
 
-    def test_hidden_state_is_gated_behind_the_js_class(self):
-        """Without .js-reveal on <html>, .reveal must not hide anything --
-        that is what makes a failed script harmless."""
+        supports = css.index("@supports (animation-timeline: view())")
+        applied = css.index("animation-timeline: view();", supports)
+        self.assertGreater(applied, supports)
+        self.assertIn("prefers-reduced-motion: no-preference",
+                      css[supports:applied])
+
+    def test_reveal_uses_a_cover_range_not_entry(self):
+        """An element taller than the viewport never fully 'enters', so an
+        entry-based range can strand a long quote or video part-way."""
         css = self._css()
-        self.assertIn(".js-reveal .reveal", css)
-        self.assertNotRegex(css, r"(?m)^\.reveal\s*\{[^}]*opacity:\s*0")
+        i = css.index("animation-range:")
+        line = css[i:css.index(";", i)]
+        self.assertIn("cover", line)
+        self.assertNotIn("entry", line)
 
-    def test_script_bails_on_reduced_motion(self):
-        self.assertIn("prefers-reduced-motion: reduce", self._template())
-
-    def test_script_bails_without_intersection_observer(self):
-        self.assertIn("'IntersectionObserver' in window", self._template())
-
-    def test_script_has_a_failsafe(self):
+    def test_no_executable_javascript_on_the_page(self):
+        """No script means no observer to miss and no timer to throttle."""
         t = self._template()
-        self.assertIn("classList.remove('js-reveal')", t)
+        scripts = re.findall(r'<script[^>]*>', t)
+        for tag in scripts:
+            self.assertIn("application/ld+json", tag,
+                          "unexpected executable script: %s" % tag)
 
-    def test_failsafe_is_unconditional(self):
-        """It must not be gated on visibilityState. A page reporting itself
-        hidden is precisely the one whose observer never fires -- gating on
-        visibility disables the rescue in the only case that needs it."""
-        t = self._template()
-        start = t.index("setTimeout(function ()")
-        body = t[start:t.index("}, 2500);", start)]
-        self.assertNotIn("visibilityState", body)
-        self.assertIn("if (fired) return;", body)
+    def test_no_leftover_js_reveal_hooks(self):
+        """Comments are stripped first -- the design history is written down in
+        them on purpose, and mentioning the old approach is not a stale hook."""
+        css = re.sub(r"/\*.*?\*/", "", self._css(), flags=re.S)
+        tpl = re.sub(r"<!--.*?-->", "", self._template(), flags=re.S)
+        for needle in ("js-reveal", "IntersectionObserver", "is-in"):
+            self.assertNotIn(needle, css, "stale hook in CSS: %s" % needle)
+            self.assertNotIn(needle, tpl, "stale hook in template: %s" % needle)
 
 
 class TestRealContentBuilds(unittest.TestCase):

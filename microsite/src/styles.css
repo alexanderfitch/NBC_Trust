@@ -424,8 +424,9 @@ body {
  * draws attention to itself works against the message -- the aim is that
  * navigation feels unhurried rather than that anything looks animated.
  *
- * Nothing here is load-bearing: with JS disabled or motion reduced, all
- * content is fully visible and the site behaves exactly as it does now.
+ * The page ships no executable JavaScript at all. Nothing here is
+ * load-bearing: where a feature is unsupported or motion is reduced, the
+ * content is simply static and fully visible.
  * ═══════════════════════════════════════════════════════════════════════ */
 
 /* Cross-document transitions: same-origin navigations crossfade instead of
@@ -466,17 +467,41 @@ body {
 }
 @keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* Scroll reveal. Default state is fully visible: the `.reveal` class is only
-   added by JS once it has confirmed IntersectionObserver support, so content
-   can never be stranded invisible. */
-.js-reveal .reveal {
-  opacity: 0;
-  transform: translateY(14px);
-  transition: opacity .6s cubic-bezier(.2, .7, .3, 1),
-              transform .6s cubic-bezier(.2, .7, .3, 1);
-  will-change: opacity, transform;
+/* Scroll reveal — pure CSS, no JavaScript.
+ *
+ * This was originally an IntersectionObserver that added a hiding class and
+ * removed it on intersection, with a timeout as a safety net. That design kept
+ * finding new ways to strand content at opacity 0: an observer that exists but
+ * never fires in a page that is never rendered, and then a rescue timer that
+ * setTimeout throttling delayed indefinitely in exactly the same hidden pages.
+ *
+ * A scroll-driven animation has no such failure mode, because the hiding only
+ * exists inside @supports — the same engine that hides the element is the one
+ * that reveals it. No script, no class, no timer, nothing to rescue. Browsers
+ * without support (and anyone who asked for reduced motion) simply get the
+ * static page, which is the correct fallback rather than a degraded one.
+ *
+ * Range is expressed in `cover` rather than `entry`: an element taller than the
+ * viewport never "fully enters", so an entry-based range can leave a long
+ * blockquote or video frame stuck part-way through its animation. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .prose h2,
+    .prose blockquote,
+    .prose .video,
+    .prose .cta,
+    .prose ul {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 18%;
+    }
+  }
 }
-.js-reveal .reveal.is-in { opacity: 1; transform: none; will-change: auto; }
+
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
 
 /* Interaction polish */
 .nav a, .prose a, .footer a, .button { transition: color .18s ease, background-color .18s ease,
@@ -493,9 +518,6 @@ html { scroll-behavior: smooth; }
   html { scroll-behavior: auto; }
   .hero__eyebrow, .hero h1, .hero__lede, .hero__eyebrow::before {
     animation: none !important;
-  }
-  .js-reveal .reveal {
-    opacity: 1 !important; transform: none !important; transition: none !important;
   }
   .cta:hover, .button:hover { transform: none; }
   *, *::before, *::after {

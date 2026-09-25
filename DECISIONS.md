@@ -321,3 +321,27 @@ person is genuinely looking at it — and finding 12 elements still at opacity 0
 unconditional, with a regression test asserting `visibilityState` does not appear in it. General
 lesson worth keeping: a safety net with a precondition is only as good as the precondition, and
 the failure mode it guards against is usually the one that invalidates it.
+
+## D-024 · 2026-09-25 · Scroll reveal rewritten as pure CSS; the page now ships no JavaScript
+Third and final failure of the JS approach from D-023. Opening the site in the preview pane showed
+all 12 tagged elements still at opacity 0 despite the unconditional failsafe being present in the
+built output — because **`setTimeout` is throttled in pages the browser considers hidden**, so the
+2.5s rescue simply never ran. The pattern is now unmistakable: every fix addressed one way for a
+JS-driven reveal to fail while leaving the underlying hazard intact. The hazard is that the hiding
+and the revealing live in two different systems, so any gap between them strands content.
+**Decision:** delete the script and express the reveal as a scroll-driven CSS animation inside
+`@supports (animation-timeline: view())`. The hidden keyframe now exists **only where the engine
+that animates it is known to run** — there is no class, no observer, no timer, and nothing to
+rescue. Unsupported browsers and anyone who asked for reduced motion get the static page, which is
+the correct fallback rather than a degraded one. Verified in the same hidden pane that broke both
+earlier versions: 0 elements invisible.
+`animation-range` is expressed in `cover`, not `entry`: an element taller than the viewport never
+"fully enters", so an entry-based range can leave a long quote or video frame stuck part-way.
+**The page now ships no executable JavaScript** (the only `<script>` is the JSON-LD block, which is
+data). On a public page for a Fed-examined trust company that is a real side benefit — nothing to
+audit, nothing to break, no third-party surface.
+Tests rewritten to assert the safety property rather than the mechanism: the hidden state must
+appear only inside the `@supports` block, the range must be `cover`-based, and no executable script
+may be present. One test initially failed on the word "IntersectionObserver" appearing in an
+explanatory comment; it now strips comments first, since writing down why the old approach was
+abandoned is the point of the comment.
