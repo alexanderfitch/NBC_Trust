@@ -1,0 +1,13 @@
+{
+  // Deploys the production microsite build (python3 microsite/build.py) as
+  // static assets. Never point this at a --local build: that one contains
+  // the confidential prospect dashboard.
+  "name": "nbc-trust",
+  "compatibility_date": "2026-09-29",
+  "account_id": "42e46fbf5ee1e843646addc0bac4a9b3",
+  "assets": {
+    "directory": "microsite/dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
