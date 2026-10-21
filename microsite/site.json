@@ -1,37 +1,29 @@
 {
   "organization": "NBC Trust",
+  "program_name": "The Owner's Table",
+  "_program_name_note": "Working name for the member community and resource hub (D-025). It appears in the wordmark, titles and copy; renaming it is a find-and-replace across content/ plus this field.",
   "base_url": "https://www.nbctrust.com",
   "path_prefix": "/succession",
   "show_draft_notice": true,
-  "_show_draft_notice_note": "Renders a discreet 'Draft' ribbon on any page whose front matter says status: draft. Set false to hide it for a clean screen-share, but the copy is still a working draft until Sam's messaging strategy lands -- the flag changes the ribbon, not the facts. Set each page's status to 'final' as real copy arrives.",
+  "_show_draft_notice_note": "Renders a discreet 'Draft' ribbon on any page whose front matter says status: draft. Set false to hide it for a clean screen-share, but the copy is still a working draft pending compliance review -- the flag changes the ribbon, not the facts. Set each page's status to 'final' as copy is approved.",
   "_path_prefix_note": "Where the microsite is mounted. PLAN.md decision #6: main domain at /succession vs a subdomain. If it becomes a subdomain root, set this to \"\". Build with --local to preview at a server root.",
   "_base_url_note": "PLACEHOLDER - confirm the real domain and whether the microsite lives at /succession or on a subdomain (PLAN.md decision #6).",
   "pages": [
-    {
-      "slug": "index",
-      "content": "hub.md",
-      "nav_label": "Overview",
-      "schema_type": "WebPage"
-    },
-    {
-      "slug": "story",
-      "content": "case-study.md",
-      "nav_label": "Dan's story",
-      "schema_type": "Article"
-    },
-    {
-      "slug": "next-generation",
-      "content": "next-generation.md",
-      "nav_label": "For next-generation advisors",
-      "schema_type": "WebPage"
-    },
-    {
-      "slug": "checklist",
-      "content": "checklist.md",
-      "nav_label": "The checklist",
-      "schema_type": "WebPage"
-    }
+    {"slug": "index", "content": "home.md", "nav_label": "Home", "in_nav": false, "schema_type": "WebPage"},
+    {"slug": "library", "content": "library.md", "nav_label": "Library", "schema_type": "CollectionPage"},
+    {"slug": "tools", "content": "tools.md", "nav_label": "Tools", "schema_type": "WebPage"},
+    {"slug": "tools/hour-audit", "content": "hour-audit.md", "in_nav": false, "schema_type": "WebPage"},
+    {"slug": "tools/readiness", "content": "readiness.md", "in_nav": false, "schema_type": "WebPage"},
+    {"slug": "story", "content": "story.md", "nav_label": "Dan's story", "schema_type": "Article"},
+    {"slug": "raise-your-hand", "content": "raise-your-hand.md", "nav_label": "Raise your hand", "schema_type": "ContactPage"},
+    {"slug": "join", "content": "join.md", "nav_label": "Join", "in_nav": false, "schema_type": "WebPage"},
+    {"slug": "next-generation", "content": "next-generation.md", "nav_label": "Next generation", "in_nav": false, "schema_type": "WebPage"}
   ],
+  "library_categories": {
+    "time": {"label": "Win back your week"},
+    "practice": {"label": "Run a tighter practice"},
+    "handover": {"label": "Plan the handover"}
+  },
   "local_tools": [
     {
       "slug": "dashboard",
@@ -42,7 +34,7 @@
   "_local_tools_note": "INTERNAL ONLY. Convenience links included in --local preview builds so working tools sit one click from the site. They are NEVER emitted by a production build and never appear in the sitemap -- the dashboard contains the proprietary scored prospect list (named firms, phone numbers, readiness scores). Guarded by a test.",
   "videos": {
     "why-we-do-this": {
-      "working_title": "Why we do this",
+      "working_title": "Why we built the Owner's Table",
       "src": null,
       "poster": null,
       "caption": "PLACEHOLDER caption"
@@ -72,5 +64,5 @@
       "caption": "PLACEHOLDER caption"
     }
   },
-  "_videos_note": "Working titles are my guesses at the 4-5 shorts Sam's doc calls for. Drew's actual edit list replaces these. Slugs are referenced from content as [video:slug]."
+  "_videos_note": "Working titles for the 4-5 shorts in the original video plan. The final edit list replaces these. Slugs are referenced from content as [video:slug]."
 }

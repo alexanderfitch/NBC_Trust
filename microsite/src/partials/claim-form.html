@@ -1,0 +1,44 @@
+<section class="band band--form" id="claim">
+<div class="wrap form-layout">
+  <form class="form" action="#" method="post" data-endpoint="PLACEHOLDER: membership sign-up endpoint (Airtable Members + consent log, PLAN.md C4)">
+    <h2>Claim your seat</h2>
+    <p>If we emailed you, use that address and your seat will be waiting. If you found us yourself, you are just as welcome.</p>
+    <div class="form__row">
+      <div class="field"><label for="c-first">First name</label><input id="c-first" name="first_name" autocomplete="given-name" required></div>
+      <div class="field"><label for="c-last">Last name</label><input id="c-last" name="last_name" autocomplete="family-name" required></div>
+    </div>
+    <div class="field"><label for="c-email">Work email</label><input id="c-email" name="email" type="email" autocomplete="email" required></div>
+    <div class="field"><label for="c-firm">Firm name <span class="optional">(optional)</span></label><input id="c-firm" name="firm" autocomplete="organization"></div>
+
+    <fieldset class="choices">
+      <legend>Where are you right now? <span class="optional">You can change this any time.</span></legend>
+      <label class="choice"><input type="radio" name="stage" value="learning" checked><span><b>Just here to learn</b><span>Send me the useful things. That&rsquo;s all.</span></span></label>
+      <label class="choice"><input type="radio" name="stage" value="thinking"><span><b>Starting to think about what&rsquo;s next</b><span>Include the handover material, too.</span></span></label>
+      <label class="choice"><input type="radio" name="stage" value="ready"><span><b>Ready for a conversation</b><span>Someone from NBC Trust will reach out to you personally.</span></span></label>
+    </fieldset>
+
+    <label class="consent"><input type="checkbox" name="briefing"><span>Yes, send me <strong>The Owner&rsquo;s Briefing</strong> &mdash; one short email a month. Unsubscribe with one click.</span></label>
+
+    <button class="button" type="submit">Email me my sign-in link</button>
+    <p class="form__fine">No password to remember. We&rsquo;ll email you a secure link to sign in.</p>
+    <p class="form__pending">Preview: this form is not connected yet, and nothing you type is sent.</p>
+  </form>
+
+  <div>
+    <div class="aside-card">
+      <h3>What your seat includes</h3>
+      <ul>
+        <li><span><b>The full library</b>Practical guides on running a leaner practice and planning a handover.</span></li>
+        <li><span><b>Tools you can use in ten minutes</b>The hour audit, the readiness check, and templates as we add them.</span></li>
+        <li><span><b>The Owner&rsquo;s Briefing</b>One email a month. Five minutes. Only if you want it.</span></li>
+        <li><span><b>Roundtables</b>Small, off-the-record conversations with other firm owners in the region.</span></li>
+        <li><span><b>A direct line</b>When you&rsquo;re ready to talk, a person in Lincoln &mdash; not a sales queue.</span></li>
+      </ul>
+    </div>
+    <div class="aside-card aside-card--light">
+      <h3>Our promise</h3>
+      <p>Membership is free and always will be. We never sell or share your details, nobody calls you because you joined, and leaving takes one click.</p>
+    </div>
+  </div>
+</div>
+</section>

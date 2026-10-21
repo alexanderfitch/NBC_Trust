@@ -345,3 +345,41 @@ appear only inside the `@supports` block, the range must be `cover`-based, and n
 may be present. One test initially failed on the word "IntersectionObserver" appearing in an
 explanatory comment; it now strips comments first, since writing down why the old approach was
 abandoned is the point of the comment.
+
+## D-025 · 2026-10-21 · Overhaul: The Owner's Table, a community and resource hub
+**Context.** Sam has stepped out and the client has given full creative latitude, including
+dropping the inherited branding and fonts (which supersedes D-022's "refresh, not a departure").
+The go-to-market has also changed: leads are called to warm them, then emailed that a free
+account has been set up for them, so they can join a community and "raise their hand" when
+ready. The site therefore has a second job beyond telling the succession story: give owners
+who are *not* ready a reason to keep coming back.
+**Positioning.** The thesis everything hangs on: *the work that wins back your week is the same
+work that makes a practice transferable.* That lets the site be honestly useful now (efficiency,
+operations) while every piece of content quietly builds toward the succession conversation. The
+hero line is "Build a practice that runs without you."
+**Name and mark.** Working name **The Owner's Table** (from NBC Trust), chosen because it fits the
+outreach mechanic exactly — "your seat is saved", "raise your hand at the table" — and speaks to
+the reader as a business owner. The mark is a round table seen from above with one seat in
+copper: the reader's. The name is one field in `site.json` plus copy; it is a proposal.
+**Information architecture.** Home · Library (articles in three tracks: win back your week, run
+a tighter practice, plan the handover) · Tools (hour audit, readiness check) · Dan's story ·
+Raise your hand · Join (claim your seat). Hand-raising is a ladder, not a switch: members choose
+"just learning / starting to think / ready to talk" at sign-up, so the CRM learns readiness
+without anyone being called.
+**Design.** Warm paper, deep prairie green, one copper accent; Fraunces (optical serif) for
+display and Inter for text, **self-hosted** from `assets/fonts/` under the SIL OFL, so the "no
+third-party request" rule from D-022 still holds. Type is large and contrast high for the
+audience. Sign-in is by emailed link, not password.
+**Still no executable JavaScript (D-024).** The library filter is radio inputs plus `:has()`; the
+two tools total their scores with CSS counters (`counter-increment: hrs var(--h)`); FAQs are
+native `<details>`. Partials are tested for `<script>` and inline handlers. The hero's
+time-based entrance now animates transform only, never opacity, so a throttled page can't
+strand it — the same lesson as D-023/D-024 applied to the remaining motion.
+**Builder.** Extended, not replaced: `:::` bands, `^` eyebrows, `->` buttons, `[partial:]`,
+`[library:]`, smart quotes, and copy written with root-relative links that get the mount prefix
+at build time. `dist/` is now cleared on each build so a renamed page can't linger and deploy.
+A test asserts every internal link in copy, partials, CTAs and the template resolves.
+**Compliance notes.** No age language anywhere (D-012) — copy speaks to "owners" and
+"experience", never age. Articles are general practice-management information, with a plain
+"not advice" line where they touch exit options. Forms are visibly marked as not connected and
+carry `PLACEHOLDER` endpoints so `--check` reports them. The Dan quote is draft wording.

@@ -1,122 +1,124 @@
-"""Generate the microsite's favicon and app icons.
+"""Generate the microsite's PNG icons and social share image.
 
-Brand basis (sampled from nbctrustco.com, DECISIONS.md D-022/D-023):
-  logo blue  #1260A8  -- sampled from their actual logo PNG
-  deep navy  #003D68  -- from their stylesheet, used for the site's ink
-  wordmark   heavy high-contrast serif ("NBC") over letterspaced serif caps
+The mark (D-025): a round table seen from above -- a solid centre, seven
+seats around it, and one seat in copper. That last seat is the reader's: the
+whole proposition is "your seat is saved". It is geometric on purpose, so it
+stays legible at 32px where a wordmark cannot, and so the SVG favicon
+(assets/mark.svg) and these PNGs are drawn from the same coordinates.
 
-Their own favicon is the full stacked logo squeezed into 32x32, which is
-illegible at that size. This uses the "NBC" monogram alone, sized to nearly
-fill the tile, which is what actually reads in a browser tab.
-
-PIL is required to REGENERATE the icons and nothing else -- the site itself
-is stdlib-only (D-005) and the generated PNGs are committed, so building or
-serving the microsite never needs this script or PIL.
+PIL is required to REGENERATE these files and nothing else -- the site itself
+is stdlib-only (D-005) and the outputs are committed, so building or serving
+the microsite never needs this script or PIL.
 
 Usage:  python3 microsite/assets/make_icons.py
 """
 
+import math
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
 OUT = Path(__file__).resolve().parent
 
-BLUE = (18, 96, 168)        # #1260A8, sampled from their logo
-WHITE = (255, 255, 255)
+DEEP = (16, 32, 27)          # #10201b
+FOREST = (26, 58, 48)        # #1a3a30
+PAPER = (239, 233, 220)      # #efe9dc
+SEAT_DIM = (140, 156, 147)   # paper at ~60% over deep, pre-blended
+COPPER = (224, 129, 78)      # #e0814e
+WHEAT = (230, 200, 143)
 
 # Rendered large then downsampled -- Lanczos on a 4x render gives far cleaner
-# serif edges at 32px than rasterising the font at 32px directly.
+# circle edges at 32px than rasterising at 32px directly.
 SUPERSAMPLE = 4
 
-SERIF_CANDIDATES = [
-    "/System/Library/Fonts/Supplemental/Bodoni 72.ttc",
-    "/System/Library/Fonts/Supplemental/Didot.ttc",
-    "/System/Library/Fonts/Supplemental/Georgia Bold.ttf",
-    "/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf",
-]
-
 SIZES = {
-    "icon-32.png": 32,      # browser tab
+    "icon-32.png": 32,      # browser tab (fallback for the SVG)
     "icon-180.png": 180,    # apple-touch-icon
-    "icon-512.png": 512,    # PWA / high-DPI / social
+    "icon-512.png": 512,    # PWA / high-DPI
 }
 
-# Size-specific marks, which is ordinary icon practice rather than a compromise.
-# At 32px three high-contrast serif letters go muddy -- Bodoni's thin strokes
-# simply do not survive being 1px wide -- so the tab icon is the "N" alone,
-# rendered in a sturdier serif whose thins hold up. Larger tiles carry the full
-# "NBC" in Bodoni, matching their wordmark.
-SMALL_MAX = 48
-SMALL_FONTS = [
-    "/System/Library/Fonts/Supplemental/Georgia Bold.ttf",
-    "/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf",
-]
+
+def draw_mark(draw, cx, cy, unit, seat_dim=SEAT_DIM):
+    """The mark on a 40-unit grid centred at (cx, cy); ``unit`` px per unit."""
+    def dot(x, y, r, fill):
+        x, y = cx + (x - 20) * unit, cy + (y - 20) * unit
+        draw.ellipse([x - r * unit, y - r * unit, x + r * unit, y + r * unit], fill=fill)
+
+    dot(20, 20, 9, PAPER)
+    # Eight seats at 45-degree steps from the top; the bottom one is "yours".
+    for k in range(8):
+        a = math.radians(-90 + 45 * k)
+        x, y = 20 + 15.5 * math.cos(a), 20 + 15.5 * math.sin(a)
+        if k == 4:
+            dot(x, y, 3.0, COPPER)
+        else:
+            dot(x, y, 2.6, seat_dim)
 
 
-def load_serif(px, candidates=None):
-    """Heaviest available high-contrast serif, to match their wordmark."""
-    for path in (candidates or SERIF_CANDIDATES):
-        if not Path(path).exists():
+def icon(px):
+    big = px * SUPERSAMPLE
+    img = Image.new("RGB", (big, big), DEEP)
+    d = ImageDraw.Draw(img)
+    # The mark fills ~80% of the tile; at 32px it needs every pixel.
+    scale = 0.9 if px <= 48 else 0.78
+    draw_mark(d, big / 2, big / 2, big * scale / 40)
+    return img.resize((px, px), Image.LANCZOS)
+
+
+def load_font(px, italic=False, weight=400, sans=False):
+    """The site's own variable fonts, pinned to the instance the CSS uses.
+    Fraunces defaults to weight 900 and the "wonky" alternates, so both are
+    set explicitly; a fallback font simply ignores the axes."""
+    if sans:
+        name, axes = "inter-latin-wght-normal.woff2", [weight]
+    else:
+        name = "fraunces-latin-full-%s.woff2" % ("italic" if italic else "normal")
+        axes = [min(144, px / SUPERSAMPLE * 2), weight, 30 if not italic else 100, 0]
+    for path in (OUT / "fonts" / name,
+                 Path("/System/Library/Fonts/Supplemental/Georgia.ttf")):
+        try:
+            font = ImageFont.truetype(str(path), px)
+        except OSError:
             continue
-        # .ttc files hold several faces; try the later (bolder) indices first.
-        for index in (1, 2, 0):
-            try:
-                f = ImageFont.truetype(path, px, index=index)
-                if "bold" in (f.getname()[1] or "").lower() or path.endswith(".ttf"):
-                    return f, "%s [%s]" % (Path(path).name, f.getname()[1])
-            except Exception:
-                continue
-    for path in (candidates or SERIF_CANDIDATES):
-        if Path(path).exists():
-            return ImageFont.truetype(path, px), Path(path).name
-    raise SystemExit("No serif font found; adjust SERIF_CANDIDATES.")
+        try:
+            font.set_variation_by_axes(axes)
+        except (OSError, ValueError):
+            pass
+        return font
+    return ImageFont.load_default()
 
 
-def render(size):
-    S = size * SUPERSAMPLE
-    img = Image.new("RGBA", (S, S), BLUE + (255,))
+def og_image():
+    """1200x630 social card: mark, name, and the promise."""
+    w, h, s = 1200, 630, 2
+    img = Image.new("RGB", (w * s, h * s), DEEP)
+    d = ImageDraw.Draw(img)
+    # a soft copper glow, top right
+    glow = Image.new("L", (w * s, h * s), 0)
+    gd = ImageDraw.Draw(glow)
+    for i in range(60, 0, -1):
+        r = i * 14 * s
+        gd.ellipse([w * s - r, -r, w * s + r, r], fill=int(90 * (1 - i / 60)))
+    img.paste(Image.new("RGB", img.size, COPPER), (0, 0), glow)
     d = ImageDraw.Draw(img)
 
-    small = size <= SMALL_MAX
-    text = "N" if small else "NBC"
-    fonts = SMALL_FONTS if small else SERIF_CANDIDATES
-    # A single letter can fill more of the tile than three can.
-    target_w = S * (0.52 if small else 0.74)
+    draw_mark(d, 140 * s, 150 * s, 2.4 * s)
+    d.text((220 * s, 112 * s), "The Owner’s Table", font=load_font(44 * s, weight=500), fill=PAPER)
+    d.text((222 * s, 168 * s), "FROM NBC TRUST", font=load_font(16 * s, weight=600, sans=True), fill=SEAT_DIM)
 
-    px = int(S * 0.4)
-    font, name = load_serif(px, fonts)
-    for _ in range(60):
-        b = d.textbbox((0, 0), text, font=font)
-        if (b[2] - b[0]) >= target_w or px > S:
-            break
-        px += max(1, int(px * 0.04))
-        font, name = load_serif(px, fonts)
-
-    box = d.textbbox((0, 0), text, font=font)
-    w, h = box[2] - box[0], box[3] - box[1]
-    # Centre on the glyphs' own ink box, not the font's line box, or the
-    # optical centre sits low because of descender metrics.
-    d.text(((S - w) / 2 - box[0], (S - h) / 2 - box[1]), text, font=font, fill=WHITE)
-
-    # Gentle rounding: a square tile reads harsh next to platform icons, and
-    # iOS masks apple-touch-icon itself, so keep the radius subtle.
-    radius = int(S * 0.16)
-    mask = Image.new("L", (S, S), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, S - 1, S - 1], radius=radius, fill=255)
-    img.putalpha(mask)
-
-    return img.resize((size, size), Image.LANCZOS), name
+    d.text((96 * s, 300 * s), "Build a practice that", font=load_font(80 * s, weight=360), fill=PAPER)
+    d.text((96 * s, 392 * s), "runs without you.", font=load_font(80 * s, italic=True, weight=360), fill=WHEAT)
+    d.text((98 * s, 530 * s), "A free community and library for independent advisors who own their firm.",
+           font=load_font(24 * s, sans=True), fill=SEAT_DIM)
+    return img.resize((w, h), Image.LANCZOS)
 
 
 def main():
-    used = None
-    for filename, size in SIZES.items():
-        img, used = render(size)
-        img.save(OUT / filename)
-        print("wrote %-14s %3dx%-3d  %s" % (filename, size, size,
-                                            "N" if size <= SMALL_MAX else "NBC"))
-    print("font: %s" % used)
+    for name, px in SIZES.items():
+        icon(px).save(OUT / name, optimize=True)
+        print("wrote", name)
+    og_image().save(OUT / "og.png", optimize=True)
+    print("wrote og.png")
 
 
 if __name__ == "__main__":

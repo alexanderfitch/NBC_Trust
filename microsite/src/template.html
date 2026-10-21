@@ -3,69 +3,103 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{title}} — {{organization}}</title>
+<title>{{title}} — {{program}}</title>
 <meta name="description" content="{{description}}">
 <link rel="canonical" href="{{canonical}}">
-<meta name="theme-color" content="#1260a8">
+<meta name="theme-color" content="#10201b">
 
+<link rel="icon" href="{{assets}}/mark.svg" type="image/svg+xml">
 <link rel="icon" href="{{assets}}/icon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="{{assets}}/icon-512.png" sizes="512x512" type="image/png">
 <link rel="apple-touch-icon" href="{{assets}}/icon-180.png">
 
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="{{organization}}">
+<meta property="og:site_name" content="{{program}} · {{organization}}">
 <meta property="og:title" content="{{title}}">
 <meta property="og:description" content="{{description}}">
 <meta property="og:url" content="{{canonical}}">
-<meta property="og:image" content="{{canonical_origin}}{{assets}}/icon-512.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="{{canonical_origin}}{{assets}}/og.png">
+<meta name="twitter:card" content="summary_large_image">
 
+<!-- Fonts are self-hosted (assets/fonts, SIL OFL): no third-party request
+     from a regulated public site (D-022 still holds; D-025). -->
+<link rel="preload" href="{{assets}}/fonts/fraunces-latin-full-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{assets}}/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{{stylesheet}}">
 <script type="application/ld+json">
 {{structured_data}}
 </script>
 </head>
-<body>
+<body class="layout-{{layout}} page-{{page_class}}">
 <a class="skip" href="#main">Skip to content</a>
 {{draft_notice}}
 
 <header class="masthead">
   <div class="wrap masthead__inner">
-    <a class="wordmark" href="{{home}}" aria-label="{{organization}} — succession">
-      <span class="wordmark__mark">NBC</span>
-      <span class="wordmark__rest"><span>Trust</span><span>Company</span></span>
+    <a class="wordmark" href="{{home}}" aria-label="{{program}}, from {{organization}} — home">
+      <svg class="wordmark__mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="9" fill="currentColor"/>
+        <g fill="currentColor" opacity=".55">
+          <circle cx="20" cy="4.5" r="2.6"/><circle cx="31" cy="9" r="2.6"/>
+          <circle cx="35.5" cy="20" r="2.6"/><circle cx="31" cy="31" r="2.6"/>
+          <circle cx="9" cy="31" r="2.6"/><circle cx="4.5" cy="20" r="2.6"/>
+          <circle cx="9" cy="9" r="2.6"/>
+        </g>
+        <circle class="wordmark__seat" cx="20" cy="35.5" r="2.9"/>
+      </svg>
+      <span class="wordmark__text">
+        <span class="wordmark__name">The Owner&rsquo;s Table</span>
+        <span class="wordmark__by">from NBC Trust</span>
+      </span>
     </a>
-    <nav class="nav" aria-label="Succession">
+    <nav class="nav" aria-label="Main">
       {{nav}}
     </nav>
+    <a class="button button--small masthead__cta" href="{{root}}/join/"><span class="masthead__cta-long">Claim your seat</span><span class="masthead__cta-short">Join free</span></a>
   </div>
 </header>
 
-<div class="wrap">
-  <header class="hero">
-    <p class="hero__eyebrow">{{eyebrow}}</p>
-    <h1>{{heading}}</h1>
-    {{lede}}
-  </header>
-</div>
+<header class="hero hero--{{layout}}">
+  <div class="wrap hero__inner">
+    <div class="hero__copy">
+      <p class="eyebrow hero__eyebrow">{{eyebrow}}</p>
+      <h1>{{heading}}</h1>
+      {{lede}}
+      {{hero_meta}}
+    </div>
+    {{hero_visual}}
+  </div>
+</header>
 
-<main id="main" class="wrap prose">
+<main id="main">
 {{body}}
 </main>
 
 <footer class="footer">
   <div class="wrap">
+    <div class="footer__top">
+      <p class="footer__statement">Build a practice that runs without you &mdash; then decide, on your own timeline, what happens to it.</p>
+      <a class="button" href="{{root}}/join/">Claim your seat</a>
+    </div>
     <div class="footer__grid">
       <div>
-        <p class="footer__wordmark">NBC Trust</p>
-        <p>A Nebraska trust company, helping independent advisers hand over the practices they built.</p>
+        <p class="footer__wordmark">The Owner&rsquo;s Table</p>
+        <p>A free community and resource library for independent advisors who own their firm. Run by NBC Trust, a Nebraska trust company in Lincoln.</p>
       </div>
       <div>
-        <h2>Succession</h2>
+        <h2>Explore</h2>
         <ul>{{footer_nav}}</ul>
       </div>
       <div>
-        <h2>NBC Trust Company</h2>
+        <h2>Membership</h2>
+        <ul>
+          <li><a href="{{root}}/join/">Claim your seat</a></li>
+          <li><a href="{{root}}/tools/hour-audit/">The hour audit</a></li>
+          <li><a href="{{root}}/tools/readiness/">Readiness check</a></li>
+          <li><a href="{{root}}/next-generation/">For next-generation advisors</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>NBC Trust</h2>
         <ul>
           <li><a href="https://nbctrustco.com/">Main site</a></li>
           <li><a href="https://nbctrustco.com/about-us-the-team/">About &amp; the team</a></li>
@@ -74,13 +108,13 @@
       </div>
     </div>
     <div class="footer__meta">
-      <span>&copy; {{year}} {{organization}}</span>
-      <span>Lincoln, Nebraska</span>
+      <span>&copy; {{year}} {{organization}} &middot; Lincoln, Nebraska</span>
+      <span>We never sell or share member information.</span>
     </div>
     <p class="footer__note">
       Required disclosures, privacy policy and regulatory language are pending
       compliance-attorney review and are not yet present on this page. Nothing here is an offer,
-      a solicitation, or a guarantee of any outcome.
+      a solicitation, investment advice, or a guarantee of any outcome.
     </p>
   </div>
 </footer>

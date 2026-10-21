@@ -102,6 +102,10 @@ class TestCTAs(unittest.TestCase):
         self.assertIn("cta--checklist", build._render_blocks("[cta:checklist]", {}))
         self.assertIn("cta--contact", build._render_blocks("[cta:contact]", {}))
 
+    def test_join_and_hand(self):
+        self.assertIn('href="/join/"', build._render_blocks("[cta:join]", {}))
+        self.assertIn('href="/raise-your-hand/"', build._render_blocks("[cta:hand]", {}))
+
     def test_unknown_cta_is_a_comment_not_a_crash(self):
         out = build._render_blocks("[cta:nope]", {})
         self.assertIn("<!-- unknown cta", out)
@@ -185,13 +189,24 @@ class TestBrandAssets(unittest.TestCase):
     """Icons and the asset pipeline."""
 
     def test_icons_exist_at_every_declared_size(self):
-        for name in ("icon-32.png", "icon-180.png", "icon-512.png"):
+        for name in ("icon-32.png", "icon-180.png", "icon-512.png", "og.png"):
             self.assertTrue((build.ASSETS_DIR / name).exists(), "missing %s" % name)
 
     def test_icons_are_real_pngs(self):
         for name in ("icon-32.png", "icon-180.png", "icon-512.png"):
             head = (build.ASSETS_DIR / name).read_bytes()[:8]
             self.assertEqual(head, b"\x89PNG\r\n\x1a\n", "%s is not a PNG" % name)
+
+    def test_fonts_are_self_hosted_with_their_licences(self):
+        """No third-party font request from a regulated public site (D-022)."""
+        fonts = build.ASSETS_DIR / "fonts"
+        self.assertTrue(list(fonts.glob("*.woff2")))
+        self.assertTrue(list(fonts.glob("OFL-*.txt")))
+        css = (build.SRC_DIR / "styles.css").read_text(encoding="utf-8")
+        tpl = (build.SRC_DIR / "template.html").read_text(encoding="utf-8")
+        for text in (css, tpl):
+            self.assertNotIn("fonts.googleapis", text)
+            self.assertNotIn("fonts.gstatic", text)
 
     def test_generator_script_is_not_shipped_as_an_asset(self):
         """make_icons.py needs PIL and is a build tool, not site content."""
@@ -263,6 +278,123 @@ class TestMotion(unittest.TestCase):
         for needle in ("js-reveal", "IntersectionObserver", "is-in"):
             self.assertNotIn(needle, css, "stale hook in CSS: %s" % needle)
             self.assertNotIn(needle, tpl, "stale hook in template: %s" % needle)
+
+
+class TestBands(unittest.TestCase):
+    """``:::`` containers break out of the prose measure into full-width bands."""
+
+    def r(self, md):
+        return build._render_blocks(md, {})
+
+    def test_container_renders_a_band_with_intro_and_items(self):
+        out = self.r("::: pillars dark\n## Heading\n\nIntro\n\n### One\n\nBody one\n\n### Two\n\nBody two\n:::")
+        self.assertIn('class="band band--pillars band--dark"', out)
+        self.assertIn('<div class="band__intro"><h2>Heading</h2>', out)
+        self.assertEqual(out.count('<div class="item">'), 2)
+
+    def test_faq_items_are_native_disclosures(self):
+        out = self.r("::: faq\n### Question?\n\nAnswer.\n:::")
+        self.assertIn("<details", out)
+        self.assertIn("<summary>Question?</summary>", out)
+
+    def test_prose_around_a_band_is_wrapped_separately(self):
+        out = self.r("Before\n\n::: tiles\n### X\n:::\n\nAfter")
+        self.assertEqual(out.count('class="wrap prose"'), 2)
+        self.assertLess(out.index("Before"), out.index("band--tiles"))
+        self.assertLess(out.index("band--tiles"), out.index("After"))
+
+    def test_unclosed_container_runs_to_the_end_rather_than_raising(self):
+        out = self.r("::: tiles\n### Item\n\ntext")
+        self.assertIn("band--tiles", out)
+        self.assertIn("text", out)
+
+    def test_eyebrow_and_buttons(self):
+        out = self.r("^ Label\n\n-> [Primary](/a/)\n-> [Second](/b/)")
+        self.assertIn('<p class="eyebrow">Label</p>', out)
+        self.assertIn('<a class="button" href="/a/">Primary</a>', out)
+        self.assertIn('<a class="button button--ghost" href="/b/">Second</a>', out)
+
+    def test_ordered_list(self):
+        self.assertIn("<ol><li>one</li><li>two</li></ol>", self.r("1. one\n2. two"))
+
+
+class TestLinksAndQuotes(unittest.TestCase):
+    def test_root_relative_links_get_the_mount_prefix(self):
+        out = build.prefix_links('<a href="/library/">x</a><img src="/assets/a.png">', "/succession")
+        self.assertIn('href="/succession/library/"', out)
+        self.assertIn('src="/succession/assets/a.png"', out)
+
+    def test_external_and_protocol_relative_links_are_untouched(self):
+        out = build.prefix_links('<a href="https://x.com/">x</a><a href="//cdn/">y</a>', "/succession")
+        self.assertIn('href="https://x.com/"', out)
+        self.assertIn('href="//cdn/"', out)
+
+    def test_no_prefix_is_a_no_op(self):
+        self.assertEqual(build.prefix_links('<a href="/x/">', ""), '<a href="/x/">')
+
+    def test_smart_quotes_never_touch_link_targets(self):
+        out = build._inline('"Owner\'s" [guide](/library/x/)')
+        self.assertIn("\u201cOwner\u2019s\u201d", out)
+        self.assertIn('href="/library/x/"', out)
+
+
+class TestLibrary(unittest.TestCase):
+    def setUp(self):
+        self.site = build.load_site_config()
+        self.articles = build.collect_library(self.site)
+
+    def test_articles_are_collected_with_categories_the_site_knows(self):
+        self.assertTrue(self.articles)
+        cats = set(self.site["library_categories"])
+        for a in self.articles:
+            self.assertIn(a["category"], cats, a["content_path"].name)
+            self.assertTrue(a["description"], a["content_path"].name)
+
+    def test_every_category_has_a_css_filter_rule(self):
+        """Filtering is CSS-only; a category without a rule could never be isolated."""
+        css = (build.SRC_DIR / "styles.css").read_text(encoding="utf-8")
+        for key in self.site["library_categories"]:
+            self.assertIn("#topic-%s:checked" % key, css)
+
+    def test_featured_view_shows_at_most_three(self):
+        out = build._render_library("featured", {"library": self.articles})
+        self.assertLessEqual(out.count('class="card '), 3)
+
+    def test_related_view_excludes_the_current_article(self):
+        cur = self.articles[0]
+        out = build._render_library("related", {"library": self.articles, "current": cur})
+        self.assertNotIn('href="%s"' % cur["root_url"], out)
+
+    def test_internal_links_in_copy_resolve_to_real_pages(self):
+        """A renamed page or article must not leave dead links behind."""
+        pages = build.collect_pages(self.site)
+        known = {"/"} | {"/%s/" % p["slug"] for p in pages} | {a["root_url"] for a in self.articles}
+        sources = [p["raw"] for p in pages + self.articles]
+        sources += [s["raw"] for s in build.partial_sources()]
+        sources += [(build.SRC_DIR / "template.html").read_text(encoding="utf-8").replace("{{root}}", "")]
+        sources += [str(v) for v in build._CTAS.values()]
+        for text in sources:
+            for target in re.findall(r'(?:\]\(|href="|\(")(/[\w/-]*)', text):
+                if target.startswith("//"):
+                    continue
+                self.assertIn(target, known, "dead internal link: %s" % target)
+
+
+class TestPartials(unittest.TestCase):
+    def test_partials_carry_no_executable_script(self):
+        """D-024 extends to partials: no <script> and no inline handlers."""
+        for p in build.partial_sources():
+            self.assertNotIn("<script", p["raw"], p["content_path"].name)
+            self.assertIsNone(re.search(r"\son[a-z]+=", p["raw"]), p["content_path"].name)
+
+    def test_unwired_forms_are_reported_as_placeholders(self):
+        found = build.find_placeholders(build.partial_sources())
+        names = {f[0] for f in found}
+        self.assertIn("claim-form.html", names)
+        self.assertIn("hand-form.html", names)
+
+    def test_unknown_partial_is_a_comment_not_a_crash(self):
+        self.assertIn("<!-- unknown partial", build._render_blocks("[partial:nope]", {}))
 
 
 class TestRealContentBuilds(unittest.TestCase):

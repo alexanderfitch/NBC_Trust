@@ -1,0 +1,54 @@
+<section class="band band--form" id="hand">
+<div class="wrap form-layout">
+  <form class="form" action="#" method="post" data-endpoint="PLACEHOLDER: contact endpoint (Airtable Firms/Interactions, matched to CRD where possible, PLAN.md C5)">
+    <h2>Raise your hand</h2>
+    <p>Tell us a little, and a person at NBC Trust will be in touch the way you prefer. That&rsquo;s it.</p>
+    <div class="form__row">
+      <div class="field"><label for="h-first">First name</label><input id="h-first" name="first_name" autocomplete="given-name" required></div>
+      <div class="field"><label for="h-last">Last name</label><input id="h-last" name="last_name" autocomplete="family-name" required></div>
+    </div>
+    <div class="form__row">
+      <div class="field"><label for="h-email">Email</label><input id="h-email" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="h-phone">Phone <span class="optional">(optional)</span></label><input id="h-phone" name="phone" type="tel" autocomplete="tel"></div>
+    </div>
+    <div class="field"><label for="h-firm">Firm name</label><input id="h-firm" name="firm" autocomplete="organization"></div>
+
+    <fieldset class="choices">
+      <legend>What would be most useful?</legend>
+      <label class="choice"><input type="radio" name="intent" value="explore" checked><span><b>An informal conversation</b><span>Understand the options. No agenda.</span></span></label>
+      <label class="choice"><input type="radio" name="intent" value="plan"><span><b>Help shaping a plan</b><span>I&rsquo;m thinking in terms of the next few years.</span></span></label>
+      <label class="choice"><input type="radio" name="intent" value="soon"><span><b>Something more immediate</b><span>I&rsquo;d like to move in the next year or so.</span></span></label>
+    </fieldset>
+
+    <div class="field">
+      <label for="h-when">Best way to reach you</label>
+      <select id="h-when" name="contact_pref">
+        <option>A phone call, weekday mornings</option>
+        <option>A phone call, weekday afternoons</option>
+        <option>Email first, please</option>
+        <option>Coffee in Lincoln or Omaha</option>
+      </select>
+    </div>
+    <div class="field"><label for="h-note">Anything you&rsquo;d like us to know <span class="optional">(optional)</span></label><textarea id="h-note" name="note"></textarea></div>
+
+    <button class="button" type="submit">Raise my hand</button>
+    <p class="form__fine">Confidential. We won&rsquo;t contact your clients, staff or custodian.</p>
+    <p class="form__pending">Preview: this form is not connected yet, and nothing you type is sent.</p>
+  </form>
+
+  <div>
+    <div class="aside-card">
+      <h3>What happens next</h3>
+      <ul>
+        <li><span><b>A person gets back to you</b>Someone from NBC Trust in Lincoln, usually within a business day.</span></li>
+        <li><span><b>A conversation, not a proposal</b>About what you want for yourself, your clients and your name.</span></li>
+        <li><span><b>You set the pace</b>Some owners talk once a year for three years. That&rsquo;s fine.</span></li>
+      </ul>
+    </div>
+    <div class="aside-card aside-card--light">
+      <h3>Not ready? That&rsquo;s the point.</h3>
+      <p>Most owners who eventually raise their hand spend a long time just reading first. <a href="/join/">Claim your seat</a> and take your time.</p>
+    </div>
+  </div>
+</div>
+</section>

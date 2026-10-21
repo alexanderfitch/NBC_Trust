@@ -71,13 +71,13 @@ it's not mine to schedule. Worth starting early — external web dev timelines r
 
 ## Blocking real content
 
-### 8. Microsite and case study copy · *Sam*
-**Need:** final copy for the hub page and the story-form case study.
-**Why it blocks:** launch, not the build. The structure is live with placeholders.
-**Meanwhile:** the scaffold is built and reviewable. `python3 microsite/build.py --check` lists
-every outstanding placeholder with file and line — 28 right now. Sam edits markdown in
-`microsite/content/`; he never has to touch HTML.
-**Useful to tell Sam:** the page structure is a proposal, not a constraint. He should challenge it.
+### 8. Microsite copy sign-off · *NBC leadership, compliance attorney*
+**Update 2026-10-21:** Sam has stepped out; the microsite was redesigned and rewritten in full as
+The Owner's Table (D-025), so this is no longer waiting on anyone to *write* copy.
+**Need now:** NBC leadership to approve the positioning, the working name, and the draft copy, and
+Dan to approve (or replace) the quote attributed to him, which is draft wording.
+**Why it blocks:** launch, not the build. Every page is `status: draft` until approved, and
+`python3 microsite/build.py --check` lists what is still owed.
 
 ### 9. Finished videos · *Drew*
 **Need:** the 4–5 edited shorts, plus poster frames and captions.
