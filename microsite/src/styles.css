@@ -63,6 +63,11 @@
   --gutter: clamp(20px, 4.5vw, 56px);
   --measure: 44rem;
   --radius: 22px;
+  /* Dark surfaces are inset, rounded panels floating on the paper rather than
+     full-bleed slabs, so light and dark never meet at a hard horizontal edge
+     and every glow is contained by a curve that frames it. */
+  --panel-inset: clamp(8px, 1.6vw, 24px);
+  --panel-radius: clamp(24px, 3vw, 44px);
   --radius-sm: 12px;
   --shadow: 0 1px 2px rgb(18 32 28 / .05), 0 12px 32px -12px rgb(18 32 28 / .18);
   --ease: cubic-bezier(.2, .7, .2, 1);
@@ -94,7 +99,7 @@ body {
 img, svg, video { display: block; max-width: 100%; }
 
 a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: .2em; }
-a:hover { color: var(--copper); }
+a:not(.button):hover { color: var(--copper); }
 
 :focus-visible {
   outline: 3px solid var(--copper);
@@ -333,21 +338,21 @@ p, li { text-wrap: pretty; }
 .hero--home {
   padding-block: clamp(56px, 8vw, 112px) clamp(64px, 8vw, 120px);
   background:
-    radial-gradient(60rem 40rem at 85% 10%, rgb(230 200 143 / .35), transparent 60%),
-    radial-gradient(40rem 30rem at 0% 100%, rgb(47 90 72 / .10), transparent 60%);
+    radial-gradient(ellipse 55% 70% at 82% 38%, rgb(230 200 143 / .34), transparent 70%),
+    radial-gradient(ellipse 40% 50% at 8% 45%, rgb(47 90 72 / .07), transparent 70%);
 }
 .hero--home::before {
   content: "";
   position: absolute;
-  right: -18vw;
-  top: 50%;
-  width: min(110vw, 1100px);
+  /* As tall as the hero and faded by closest-side, so the rings dissolve
+     before either edge instead of being cut off by it. */
+  top: 0;
+  bottom: 0;
+  right: -8vw;
   aspect-ratio: 1;
-  translate: 0 -50%;
-  border-radius: 50%;
   background: repeating-radial-gradient(circle, transparent 0 88px, rgb(18 32 28 / .06) 88px 89px);
-  mask-image: radial-gradient(circle, #000 30%, transparent 70%);
-  -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 70%);
+  mask-image: radial-gradient(closest-side, #000 35%, transparent 100%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 35%, transparent 100%);
   pointer-events: none;
 }
 .hero--home .hero__inner {
@@ -515,8 +520,8 @@ p, li { text-wrap: pretty; }
   font-variation-settings: "SOFT" 100;
 }
 
-.prose a { color: var(--copper); }
-.prose a:hover { color: var(--copper-hover); }
+.prose a:not(.button) { color: var(--copper); }
+.prose a:not(.button):hover { color: var(--copper-hover); }
 
 .prose .actions { margin-top: 1.6em; }
 
@@ -524,20 +529,35 @@ p, li { text-wrap: pretty; }
 
 .band { padding-block: clamp(72px, 10vw, 136px); }
 .band + .band { border-top: 1px solid var(--line); }
-.band--tint { background: var(--paper-2); border-top: 0 !important; }
-.band--tint + .band { border-top: 0; }
+/* Tinted sections fade in from the paper and back out to it -- no edge. */
+.band--tint, .band--related {
+  background: linear-gradient(180deg,
+    var(--paper) 0%, var(--paper-2) 18%, var(--paper-2) 82%, var(--paper) 100%);
+  border-top: 0 !important;
+}
+.band--tint + .band, .band--related + .band { border-top: 0; }
+.band:has(+ .band--tint) { padding-bottom: clamp(32px, 5vw, 64px); }
 
+.band--dark, .cta, .footer {
+  margin: var(--panel-inset);
+  border-radius: var(--panel-radius);
+  overflow: clip;
+}
 .band--dark {
+  position: relative;
   background:
-    radial-gradient(50rem 30rem at 90% 0%, rgb(224 129 78 / .14), transparent 60%),
-    linear-gradient(180deg, var(--forest), var(--deep));
+    radial-gradient(ellipse 60% 70% at 88% 12%, rgb(224 129 78 / .16), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 10% 100%, rgb(47 90 72 / .45), transparent 70%),
+    linear-gradient(165deg, var(--forest), var(--deep) 75%);
   color: var(--on-deep);
   border-top: 0 !important;
 }
+.band--dark + .band, .band + .band--dark, .cta + * { border-top: 0; }
 .band--dark + .band { border-top: 0; }
 .band--dark h2, .band--dark h3 { color: var(--on-deep); }
 .band--dark h2 em, .band--dark h3 em { color: var(--wheat); }
-.band--dark p, .band--dark li { color: var(--on-deep-2); }
+.band--dark p, .band--dark li,
+.band--dark .item p, .band--dark .item ul, .band--dark .item li { color: var(--on-deep-2); }
 .band--dark .eyebrow { color: var(--copper-bright); }
 .band--dark a:not(.button) { color: var(--wheat); }
 .band--dark .button--ghost { color: var(--on-deep); border-color: var(--line-deep); }
@@ -735,7 +755,6 @@ p, li { text-wrap: pretty; }
 @media (max-width: 900px) { .band--faq .wrap { grid-template-columns: 1fr; } }
 
 /* related reading at the foot of an article */
-.band--related { background: var(--paper-2); }
 .band--related .band__intro h2 { font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem); }
 .band--related .cards { margin-top: 40px; }
 
@@ -857,8 +876,9 @@ p, li { text-wrap: pretty; }
   overflow: clip;
   padding-block: clamp(80px, 11vw, 144px);
   background:
-    radial-gradient(ellipse 70% 60% at 50% 115%, rgb(224 129 78 / .26), transparent 70%),
-    linear-gradient(180deg, var(--forest), var(--deep));
+    radial-gradient(ellipse 60% 55% at 50% 100%, rgb(224 129 78 / .24), transparent 75%),
+    radial-gradient(ellipse 50% 60% at 50% 0%, rgb(47 90 72 / .55), transparent 75%),
+    var(--deep);
   color: var(--on-deep);
   text-align: center;
 }
@@ -1143,11 +1163,11 @@ p, li { text-wrap: pretty; }
   background: var(--deep);
   color: var(--on-deep-2);
   padding-block: clamp(64px, 8vw, 104px) 40px;
+  margin-top: 0;
   font-size: .9688rem;
 }
-.footer a { color: var(--on-deep); text-decoration: none; }
-.footer a:hover { color: var(--wheat); text-decoration: underline; }
-.footer .button { color: #fff; text-decoration: none; }
+.footer a:not(.button) { color: var(--on-deep); text-decoration: none; }
+.footer a:not(.button):hover { color: var(--wheat); text-decoration: underline; }
 .footer__top {
   display: flex;
   flex-wrap: wrap;

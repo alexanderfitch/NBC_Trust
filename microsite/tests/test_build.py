@@ -397,6 +397,22 @@ class TestPartials(unittest.TestCase):
         self.assertIn("<!-- unknown partial", build._render_blocks("[partial:nope]", {}))
 
 
+class TestButtonsKeepTheirColours(unittest.TestCase):
+    """A contextual link rule like ``.prose a`` (0-1-1) outranks ``.button``
+    (0-1-0), which once turned buttons in body copy copper-on-copper --
+    invisible. Every link-colour rule must exclude buttons."""
+
+    def test_link_colour_rules_exclude_buttons(self):
+        css = re.sub(r"/\*.*?\*/", "", (build.SRC_DIR / "styles.css").read_text(encoding="utf-8"), flags=re.S)
+        for selectors, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+            if not re.search(r"(^|;)\s*color\s*:", body):
+                continue
+            for sel in selectors.split(","):
+                sel = sel.strip()
+                if re.search(r"(^|\s)a(:hover)?$", sel) and ".nav" not in sel and "inherit" not in body:
+                    self.fail("link colour rule may restyle buttons: %r" % sel)
+
+
 class TestRealContentBuilds(unittest.TestCase):
     """The committed content must actually build -- catches a broken site.json."""
 
