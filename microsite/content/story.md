@@ -40,6 +40,8 @@ The families who had worked with him for decades didn't get a letter announcing 
 
 The clients stayed. Not all of them, and not automatically, but the relationships survived because they were handed over rather than transferred.
 
+And Dan didn't disappear. More than five years on, he is still part of the practice, working alongside a younger advisor who carries much of the day-to-day. Between the two of them, Dan now earns more than he did before the transition began.
+
 [video:what-clients-felt]
 
 ## What he would tell another owner
